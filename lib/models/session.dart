@@ -1,12 +1,31 @@
+import 'package:momentum/models/project.dart';
+
 class Session {
+  static const String table = "session";
+  static const String primaryKey = "id";
+  static const String colProjectId = "project_id";
+  static const String colDate = "date";
+  static const String colDurationMinutes = "duration_minutes";
+  static const String colNote = "note";
+  
+  static const String createTableSql = '''
+      CREATE TABLE $table (
+        $primaryKey          INTEGER      PRIMARY KEY AUTOINCREMENT,
+        $colProjectId        INTEGER      NOT NULL,
+        $colDate             INTEGER      NOT NULL,
+        $colDurationMinutes  INTEGER      NOT NULL,
+        $colNote             TEXT         NOT NULL,
+        FOREIGN KEY ($colProjectId) REFERENCES 
+          ${Project.table}(${Project.primaryKey})
+          ON DELETE CASCADE
+      )
+    ''';
+
   final int? id;
   final int projectId;
   final DateTime date;
   final int durationMinutes;
   final String note;
-
-  static const String table = "session";
-  static const String primaryKey = "id";
 
   Session({
     this.id,
@@ -21,21 +40,21 @@ class Session {
 
   factory Session.fromMap(Map<String, dynamic> map) {
     return Session(
-      id: map['id'] as int?,
-      projectId: map['projectId'] as int,
-      date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int, isUtc: true),
-      durationMinutes: map['durationMinutes'] as int,
-      note: map['note'] as String
+      id: map[primaryKey] as int?,
+      projectId: map[colProjectId] as int,
+      date: DateTime.fromMillisecondsSinceEpoch(map[colDate] as int, isUtc: true),
+      durationMinutes: map[colDurationMinutes] as int,
+      note: map[colNote] as String
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) 'id': id,
-      'projectId': projectId,
-      'date': date.millisecondsSinceEpoch,
-      'durationMinutes': durationMinutes,
-      'note': note,
+      if (id != null) primaryKey: id,
+      colProjectId: projectId,
+      colDate: date.millisecondsSinceEpoch,
+      colDurationMinutes: durationMinutes,
+      colNote: note,
     };
   }
 

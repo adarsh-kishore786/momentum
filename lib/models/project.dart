@@ -1,13 +1,27 @@
 import 'package:momentum/models/project_status.dart';
 
 class Project {
+  static const String table = "project";
+  static const String primaryKey = "id";
+  static const String colName = "name";
+  static const String colDescription = "description";
+  static const String colStatus = "status";
+
+  static const String createTableSql = '''
+      CREATE TABLE ${Project.table} (
+        $primaryKey     INTEGER      PRIMARY KEY AUTOINCREMENT,
+        $colName        TEXT         NOT NULL,
+        $colDescription TEXT         NOT NULL,
+        $colStatus      TEXT         NOT NULL
+          DEFAULT 'active'
+          CHECK ($colStatus IN ('active', 'dormant', 'archived'))
+      )
+    ''';
+
   final int? id;
   final String name;
   final String description;
   final ProjectStatus status;
-
-  static const String table = "project";
-  static const String primaryKey = "id";
 
   Project({
     this.id,
@@ -18,19 +32,19 @@ class Project {
 
   factory Project.fromMap(Map<String, dynamic> map) {
     return Project(
-      id: map['id'] as int?,
-      name: map['name'] as String,
-      description: map['description'] as String,
-      status: ProjectStatus.values.byName(map['status'] as String)
+      id: map[primaryKey] as int?,
+      name: map[colName] as String,
+      description: map[colDescription] as String,
+      status: ProjectStatus.values.byName(map[colStatus] as String)
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      if (id != null) 'id': id,
-      'name': name,
-      'description': description,
-      'status': status.name,
+      if (id != null) primaryKey: id,
+      colName: name,
+      colDescription: description,
+      colStatus: status.name,
     };
   }
   

@@ -39,43 +39,8 @@ class DatabaseHelper {
   }
 
   Future<void> _createDB(Database db, int version) async {
-    // First the 'project' table
-    await db.execute('''
-      CREATE TABLE ${Project.table} (
-        ${Project.primaryKey} INTEGER      PRIMARY KEY AUTOINCREMENT,
-        name                  TEXT         NOT NULL,
-        description           TEXT         NOT NULL,
-        status                TEXT         NOT NULL
-          CHECK (status IN ('active', 'dormant', 'archived'))
-      )
-    ''');
-
-    // 'session' table
-    await db.execute('''
-      CREATE TABLE ${Session.table} (
-        ${Session.primaryKey} INTEGER      PRIMARY KEY AUTOINCREMENT,
-        projectId             INTEGER      NOT NULL,
-        date                  INTEGER      NOT NULL,
-        durationMinutes       INTEGER      NOT NULL,
-        note                  TEXT         NOT NULL,
-        FOREIGN KEY (projectId) REFERENCES 
-          ${Project.table}(${Project.primaryKey})
-          ON DELETE CASCADE
-      )
-    ''');
-
-    // 'idea' table
-    await db.execute('''
-      CREATE TABLE ${Idea.table} (
-        ${Idea.primaryKey} INTEGER      PRIMARY KEY AUTOINCREMENT,
-        projectId          INTEGER      NOT NULL,
-        description        TEXT         NOT NULL,
-        state              TEXT         NOT NULL 
-          CHECK (state IN ('open', 'done')),
-        FOREIGN KEY (projectId) REFERENCES 
-          ${Project.table}(${Project.primaryKey})
-          ON DELETE CASCADE
-      )
-    ''');
+    await db.execute(Project.createTableSql);
+    await db.execute(Session.createTableSql);
+    await db.execute(Idea.createTableSql);
   }
 }
