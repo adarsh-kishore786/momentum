@@ -1,6 +1,7 @@
 import 'package:momentum/data/database_exception.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_status.dart';
+import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/models/session.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -108,19 +109,44 @@ class ProjectDao {
     }
   }
 
-  Future getProjectsWithLastSession() async {
-    return await db.rawQuery('''
-      SELECT ${Project.table}.${Project.primaryKey},
-              ${Session.table}.${Session.primaryKey} FROM 
+  Future<List<ProjectWithLastSession>> getProjectsWithLastSession() async {
+    const sql = '''
+      SELECT
+        p.${Project.primaryKey}         as p_id,
+        p.${Project.colName}            as p_name,
+        p.${Project.colStatus}          as p_status,
+        p.${Project.colDescription}     as p_description,
+        s.${Session.primaryKey}         as s_id,
+        s.${Session.colDate}            as s_date,
+        s.${Session.colDurationMinutes} as s_duration_minutes,
+        s.${Session.colNote}            as s_note
+      FROM ${Project.table} p
+      LEFT JOIN ${Session.table} s
+        -- this first condition is redundant but helps in indexing
+        ON s.${Session.colProjectId} = p.${Project.primaryKey}
+        AND s.${Session.primaryKey} = (
+          SELECT ${Session.primaryKey}
+          FROM ${Session.table}
+          WHERE ${Session.colProjectId} = p.${Project.primaryKey}
+          ORDER BY ${Session.colDate} DESC
+          LIMIT 1
+        )
+      WHERE p.${Project.colStatus} != ?
+      ORDER BY 
+        CASE WHEN s.${Session.colDate} IS NULL THEN 1 ELSE 0 END,
+        s.${Session.colDate} DESC
+    ''';
 
-      ${Project.table} LEFT JOIN ${Session.table}
-      ON  ${Session.table}.projectId = ${Project.table}.${Project.primaryKey}
-      AND ${Session.table}.id = (
-       SELECT id FROM ${Session.table}
-       WHERE ${Session.table}.projectId = ${Project.table}.${Project.primaryKey}
-       ORDER BY date DESC
-       LIMIT 1
-      )
-    ''');
+    try {
+
+      final rows = await db.rawQuery(sql, [ProjectStatus.archived.name]);
+      return rows.map(ProjectWithLastSession.fromMap).toList();
+
+    } on DatabaseException catch (e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Could not fetch projects with last session', cause: e),
+        stack
+      );
+    }
   }
 }
