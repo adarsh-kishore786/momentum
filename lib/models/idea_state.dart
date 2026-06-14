@@ -1,0 +1,1 @@
+enum IdeaState { open, done }
