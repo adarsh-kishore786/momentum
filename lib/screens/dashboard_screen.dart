@@ -113,11 +113,15 @@ class _ProjectCard extends StatelessWidget {
   const _ProjectCard({required this.item});
 
   Color get _recencyColor {
-    if (item.lastSession == null) return const Color(0xFFF5603A);
+    const activeColor  = Color(0xFFC8F53A);
+    const fadingColor  = Color(0xFFF5C23A);
+    const fadedColor = Color(0xFFF5603A);
+
+    if (item.lastSession == null) return fadedColor;
     final days = DateTime.now().difference(item.lastSession!.date).inDays;
-    if (days <= 7)  return const Color(0xFFC8F53A);
-    if (days <= 14) return const Color(0xFFF5C23A);
-    return const Color(0xFFF5603A);
+    if (days <= 7)  return activeColor;
+    if (days <= 14) return fadingColor;
+    return fadedColor;
   }
 
   String get _recencyLabel {

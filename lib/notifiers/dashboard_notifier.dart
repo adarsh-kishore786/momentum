@@ -11,10 +11,7 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
     return repository.getProjectsWithLastSession();
   }
 
-  void refresh() {
-    ref.invalidateSelf();
-  }
-
+  void refresh() => ref.invalidateSelf();
 }
 
 final dashboardProvider = 
