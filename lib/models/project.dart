@@ -13,8 +13,8 @@ class Project {
         $colName        TEXT         NOT NULL,
         $colDescription TEXT         NOT NULL,
         $colStatus      TEXT         NOT NULL
-          DEFAULT 'active'
-          CHECK ($colStatus IN ('plan', 'active', 'archived'))
+          DEFAULT 'planned'
+          CHECK ($colStatus IN ('planned', 'active', 'archived'))
       )
     ''';
 

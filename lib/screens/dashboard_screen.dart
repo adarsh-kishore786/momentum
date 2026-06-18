@@ -47,8 +47,8 @@ class _Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final plan = projects.where(
-      (p) => p.project.status == ProjectStatus.plan
+    final planned = projects.where(
+      (p) => p.project.status == ProjectStatus.planned
     ).toList();
 
     final active  = projects.where(
@@ -66,43 +66,49 @@ class _Dashboard extends StatelessWidget {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white60,
             dividerColor: Colors.purple,
             tabs: [
               Tab(text: "Active"),
               Tab(text: "Archived"),
-              Tab(text: "Planning")
+              Tab(text: "Planned")
             ],
           ),
+          
         ),
-        body: TabBarView(
-          children: [
-            _ProjectsCard(projects: active, projectName: "active",),
-            _ProjectsCard(projects: archived, projectName: "archived",),
-            _ProjectsCard(projects: plan, projectName: "planned",),
-          ],
+        body: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: TabBarView(
+            children: [
+              _ListCard(projects: active, projectStatus: ProjectStatus.active),
+              _ListCard(projects: archived, projectStatus: ProjectStatus.archived),
+              _ListCard(projects: planned, projectStatus: ProjectStatus.planned),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ProjectsCard extends StatelessWidget {
+class _ListCard extends StatelessWidget {
   final List<ProjectWithLastSession> projects;
-  final String projectName;
+  final ProjectStatus projectStatus;
 
-  const _ProjectsCard({required this.projects, required this.projectName});
+  const _ListCard({required this.projects, required this.projectStatus});
 
   @override
   Widget build(BuildContext context) {
     if (projects.isEmpty) {
-      return Text(
-        "No $projectName projects!",
-        style: TextStyle(
-          color: Colors.white60,
-          fontSize: 20,
+      return Center(
+        child: Text(
+          "No ${projectStatus.name} projects!",
+          style: TextStyle(
+            color: Colors.white60,
+            fontSize: 20,
+          ),
         ),
       );
     }
@@ -111,7 +117,18 @@ class _ProjectsCard extends StatelessWidget {
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, i) => _ProjectCard(item: projects[i]),
+            (context, i) {
+              switch (projectStatus) {
+                case ProjectStatus.active: 
+                  return _ActiveProjectCard(item: projects[i]);
+
+                case ProjectStatus.archived:
+                  return _ArchivedProjectCard(item: projects[i]);
+
+                case ProjectStatus.planned:
+                  return _ActiveProjectCard(item: projects[i]);
+              }
+            },
             childCount: projects.length,
           ),
         ),
@@ -120,10 +137,10 @@ class _ProjectsCard extends StatelessWidget {
   }
 }
 
-class _ProjectCard extends StatelessWidget {
+class _ActiveProjectCard extends StatelessWidget {
   final ProjectWithLastSession item;
 
-  const _ProjectCard({required this.item});
+  const _ActiveProjectCard({required this.item});
 
   Color get _recencyColor {
     const activeColor  = Color(0xFFC8F53A);
@@ -186,10 +203,10 @@ class _ProjectCard extends StatelessWidget {
   }
 }
 
-class _DormantCard extends ConsumerWidget {
+class _ArchivedProjectCard extends ConsumerWidget {
   final ProjectWithLastSession item;
 
-  const _DormantCard({required this.item});
+  const _ArchivedProjectCard({required this.item});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,7 +222,7 @@ class _DormantCard extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(item.project.name,
-            style: const TextStyle(color: Color(0xFF4A4A4A), fontSize: 14)),
+            style: const TextStyle(color: Color(0xFFEEDDCC), fontSize: 14)),
           GestureDetector(
             onTap: () {
               // revive — will wire to repository in next step
@@ -217,7 +234,11 @@ class _DormantCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text('Revive',
-                style: TextStyle(color: Color(0xFF555555), fontSize: 10)),
+                style: TextStyle(
+                  color: Color(0xFFEEDDCC),
+                  fontSize: 12
+                ),
+              ),
             ),
           ),
         ],
