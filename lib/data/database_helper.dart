@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
+  static const int _version = 1;
   static Database? _db;
 
   DatabaseHelper._init();
@@ -25,10 +26,10 @@ class DatabaseHelper {
 
       return await openDatabase(
         path,
-        version: 1,
+        version: _version,
         onCreate: _createDB,
         onOpen: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
-        onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON')
+        onConfigure: (db) async => await db.execute('PRAGMA foreign_keys = ON'),
       );
     } catch (e, stack) {
       Error.throwWithStackTrace(

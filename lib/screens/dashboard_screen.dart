@@ -33,8 +33,13 @@ class _Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final active  = projects.where((p) => p.project.status == ProjectStatus.active).toList();
-    final dormant = projects.where((p) => p.project.status == ProjectStatus.dormant).toList();
+    final active  = projects.where(
+      (p) => p.project.status == ProjectStatus.active
+    ).toList();
+
+    final archived = projects.where(
+      (p) => p.project.status == ProjectStatus.archived
+    ).toList();
 
     return CustomScrollView(
       slivers: [
@@ -46,11 +51,11 @@ class _Dashboard extends StatelessWidget {
             childCount: active.length,
           ),
         ),
-        _SectionLabel('Dormant', dormant.length),
+        _SectionLabel('Archived', archived.length),
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, i) => _DormantCard(item: dormant[i]),
-            childCount: dormant.length,
+            (context, i) => _DormantCard(item: archived[i]),
+            childCount: archived.length,
           ),
         ),
       ],
@@ -115,13 +120,13 @@ class _ProjectCard extends StatelessWidget {
   Color get _recencyColor {
     const activeColor  = Color(0xFFC8F53A);
     const fadingColor  = Color(0xFFF5C23A);
-    const fadedColor = Color(0xFFF5603A);
+    const dormantColor = Color(0xFFF5603A);
 
-    if (item.lastSession == null) return fadedColor;
+    if (item.lastSession == null) return dormantColor;
     final days = DateTime.now().difference(item.lastSession!.date).inDays;
     if (days <= 7)  return activeColor;
     if (days <= 14) return fadingColor;
-    return fadedColor;
+    return dormantColor;
   }
 
   String get _recencyLabel {

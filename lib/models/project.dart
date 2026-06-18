@@ -14,7 +14,7 @@ class Project {
         $colDescription TEXT         NOT NULL,
         $colStatus      TEXT         NOT NULL
           DEFAULT 'active'
-          CHECK ($colStatus IN ('active', 'dormant', 'archived'))
+          CHECK ($colStatus IN ('plan', 'active', 'archived'))
       )
     ''';
 
