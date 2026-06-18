@@ -117,18 +117,8 @@ class _ListCard extends StatelessWidget {
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, i) {
-              switch (projectStatus) {
-                case ProjectStatus.active: 
-                  return _ActiveProjectCard(item: projects[i]);
-
-                case ProjectStatus.archived:
-                  return _ArchivedProjectCard(item: projects[i]);
-
-                case ProjectStatus.planned:
-                  return _ActiveProjectCard(item: projects[i]);
-              }
-            },
+            (context, i) =>
+              _ProjectCard(item: projects[i], status: projectStatus),
             childCount: projects.length,
           ),
         ),
@@ -137,12 +127,21 @@ class _ListCard extends StatelessWidget {
   }
 }
 
-class _ActiveProjectCard extends StatelessWidget {
+class _ProjectCard extends StatelessWidget {
   final ProjectWithLastSession item;
+  final ProjectStatus status;
 
-  const _ActiveProjectCard({required this.item});
+  const _ProjectCard({required this.item, required this.status});
 
-  Color get _recencyColor {
+  Color get _boxColor {
+    if (status == ProjectStatus.archived) {
+      return const Color(0xFF222222);
+    }
+
+    if (status == ProjectStatus.planned) {
+      return const Color(0x22222222);
+    }
+
     const activeColor  = Color(0xFFC8F53A);
     const fadingColor  = Color(0xFFF5C23A);
     const dormantColor = Color(0xFFF5603A);
@@ -155,6 +154,10 @@ class _ActiveProjectCard extends StatelessWidget {
   }
 
   String get _recencyLabel {
+    if (status == ProjectStatus.archived || status == ProjectStatus.planned) {
+      return '';
+    }
+
     if (item.lastSession == null) return 'never';
     final days = DateTime.now().difference(item.lastSession!.date).inDays;
     if (days == 0) return 'today';
@@ -164,12 +167,29 @@ class _ActiveProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color boxDecorationColor;
+    String buttonText;
+
+    switch (status) {
+      case ProjectStatus.active: 
+        boxDecorationColor = const Color(0xFF1C1C1C);
+        buttonText = "Log";
+
+      case ProjectStatus.archived:
+        boxDecorationColor = const Color(0xFF181818);
+        buttonText = "Revive";
+
+      case ProjectStatus.planned:
+        boxDecorationColor = const Color(0xFF1A1A1A);
+        buttonText = "Start";
+    }
+
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C),
+        color: boxDecorationColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: _recencyColor, width: 3)),
+        border: Border(left: BorderSide(color: _boxColor, width: 3)),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -177,69 +197,63 @@ class _ActiveProjectCard extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
-              Text(item.project.name,
-                style: const TextStyle(
-                  color: Color(0xFFE8E8E8),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                )),
-              Text(_recencyLabel,
-                style: TextStyle(color: _recencyColor, fontSize: 10)),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(item.project.name,
+                    style: const TextStyle(
+                      color: Color(0xFFE8E8E8),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    )
+                  ),
+
+                  if (item.lastSession != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      item.lastSession!.note,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFAAAAAA),
+                        fontSize: 14
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 10,
+                children: [
+                  if (status == ProjectStatus.active)
+                    Text(
+                      _recencyLabel,
+                      style: TextStyle(
+                        color: _boxColor,
+                        fontSize: 16
+                      )
+                    ),
+
+                  TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll<Color>(Color(0x20000000)),
+                      
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      buttonText,
+                    )
+                  ),
+                ],
+              ),
+
             ],
-          ),
-          if (item.lastSession != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              item.lastSession!.note,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFF555555), fontSize: 12),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ArchivedProjectCard extends ConsumerWidget {
-  final ProjectWithLastSession item;
-
-  const _ArchivedProjectCard({required this.item});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF181818),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF222222)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(item.project.name,
-            style: const TextStyle(color: Color(0xFFEEDDCC), fontSize: 14)),
-          GestureDetector(
-            onTap: () {
-              // revive — will wire to repository in next step
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF2A2A2A)),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text('Revive',
-                style: TextStyle(
-                  color: Color(0xFFEEDDCC),
-                  fontSize: 12
-                ),
-              ),
-            ),
           ),
         ],
       ),

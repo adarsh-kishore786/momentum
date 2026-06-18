@@ -24,9 +24,29 @@ class FakeRepository implements Repository {
         'p_status': "active",
         'p_description': "Understanding the architecture of modern AI",
         's_id': 1,
-        's_date': DateTime(2026, 6, 18).toUtc().millisecondsSinceEpoch,
+        's_date': DateTime(2026, 6, 18).millisecondsSinceEpoch,
         's_duration_minutes': 50,
         's_note': "Read on different types of parameterised autoregressive models"
+      },
+      {
+        'p_id': 4,
+        'p_name': "Computer Systems",
+        'p_status': "active",
+        'p_description': "Understanding computer systems better",
+        's_id': 2,
+        's_date': DateTime(2026, 5, 31).millisecondsSinceEpoch,
+        's_duration_minutes': 85,
+        's_note': "Solved some problems of CS:APP Ch 2"
+      },
+      {
+        'p_id': 5,
+        'p_name': "Computer Networking",
+        'p_status': "archived",
+        'p_description': "Understanding computer networking",
+        's_id': 4,
+        's_date': DateTime(2026, 2, 27).millisecondsSinceEpoch,
+        's_duration_minutes': 30,
+        's_note': "Read Beej's guide to networking on `accept()`"
       },
       {
         'p_id': 2,
@@ -36,7 +56,7 @@ class FakeRepository implements Repository {
       },
       {
         'p_id': 3,
-        'p_name': "Building LLM",
+        'p_name': "BYOLLM",
         'p_status': "planned",
         'p_description': "Building LLM from scratch in Rust"
       }
