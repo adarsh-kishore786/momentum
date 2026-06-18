@@ -17,6 +17,39 @@ class SessionDao {
 
   SessionDao({required this.db});
 
+  Future<Session> insert(Session session) async {
+    try {
+      final id = await db.insert(
+        Session.table,
+        session.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.abort
+      );
+
+      return session.copyWith(id: id);
+
+    } on DatabaseException catch (e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Failed to insert session', cause: e),
+        stack
+      );
+    }
+  }
+
+  Future<void> delete(Session session) async {
+    try {
+      await db.delete(
+        Session.table,
+        where: '${Session.primaryKey} = ?',
+        whereArgs: [session.id]
+      );
+    } on DatabaseException catch (e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Failed to delete session', cause: e),
+        stack
+      );
+    }
+  }
+
   Future<List<Session>> getAll({
       SessionCursor? after,
       int limit = 30

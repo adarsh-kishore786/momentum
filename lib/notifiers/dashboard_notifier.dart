@@ -7,7 +7,7 @@ import 'package:momentum/providers/providers.dart';
 class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
   @override
   FutureOr<List<ProjectWithLastSession>> build() {
-    final repository = ref.watch(projectRepositoryProvider);
+    final repository = ref.watch(repositoryProvider);
     return repository.getProjectsWithLastSession();
   }
 
