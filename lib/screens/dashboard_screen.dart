@@ -13,6 +13,20 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF141414),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          "MOMENTUM",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        
+      ),
       body: SafeArea(
         child: state.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -33,6 +47,10 @@ class _Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final plan = projects.where(
+      (p) => p.project.status == ProjectStatus.plan
+    ).toList();
+
     final active  = projects.where(
       (p) => p.project.status == ProjectStatus.active
     ).toList();
@@ -41,73 +59,63 @@ class _Dashboard extends StatelessWidget {
       (p) => p.project.status == ProjectStatus.archived
     ).toList();
 
-    return CustomScrollView(
-      slivers: [
-        _Header(),
-        _SectionLabel('Active', active.length),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) => _ProjectCard(item: active[i]),
-            childCount: active.length,
+    return DefaultTabController(
+      initialIndex: 0,
+      length: 3,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          bottom: const TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white60,
+            dividerColor: Colors.purple,
+            tabs: [
+              Tab(text: "Active"),
+              Tab(text: "Archived"),
+              Tab(text: "Planning")
+            ],
           ),
         ),
-        _SectionLabel('Archived', archived.length),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) => _DormantCard(item: archived[i]),
-            childCount: archived.length,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
-        child: Text(
-          'Projects',
-          style: const TextStyle(
-            color: Color(0xFFF0F0F0),
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.5,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  final int count;
-
-  const _SectionLabel(this.title, this.count);
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: TabBarView(
           children: [
-            Text(title.toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFF444444),
-                fontSize: 10,
-                letterSpacing: 1.2,
-              )),
-            Text('$count projects',
-              style: const TextStyle(color: Color(0xFF333333), fontSize: 10)),
+            _ProjectsCard(projects: active, projectName: "active",),
+            _ProjectsCard(projects: archived, projectName: "archived",),
+            _ProjectsCard(projects: plan, projectName: "planned",),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ProjectsCard extends StatelessWidget {
+  final List<ProjectWithLastSession> projects;
+  final String projectName;
+
+  const _ProjectsCard({required this.projects, required this.projectName});
+
+  @override
+  Widget build(BuildContext context) {
+    if (projects.isEmpty) {
+      return Text(
+        "No $projectName projects!",
+        style: TextStyle(
+          color: Colors.white60,
+          fontSize: 20,
+        ),
+      );
+    }
+    
+    return CustomScrollView(
+      slivers: [
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, i) => _ProjectCard(item: projects[i]),
+            childCount: projects.length,
+          ),
+        ),
+      ],
     );
   }
 }
