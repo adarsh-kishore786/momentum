@@ -1,16 +1,16 @@
-# momentum
+# Momentum
 
-A new Flutter project.
+A mobile app (Flutter) for tracking personal technical projects.
+The core philosophy: projects are never "done", so the app tracks 
+momentum and time invested, not completion.
 
-## Getting Started
+## The Problem
 
-This project is a starting point for a Flutter application.
+Personal learning projects stall not because of lost interest, but because 
+there's no lightweight way to notice neglect, record progress, or capture 
+ideas as they come. Traditional task managers impose a completion mindset 
+that doesn't fit open-ended technical work.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Still in progress
