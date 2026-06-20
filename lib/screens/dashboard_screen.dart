@@ -11,30 +11,15 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(dashboardProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF141414),
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          "MOMENTUM",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.5,
-          ),
+    return SafeArea(
+      child: state.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator()
         ),
-        backgroundColor: Colors.transparent,
-        
-      ),
-      body: SafeArea(
-        child: state.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
-            child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
-          ),
-          data: (projects) => _Dashboard(projects: projects),
+        error: (e, _) => Center(
+          child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
         ),
+        data: (projects) => _Dashboard(projects: projects),
       ),
     );
   }
@@ -76,7 +61,6 @@ class _Dashboard extends StatelessWidget {
               Tab(text: "Planned")
             ],
           ),
-          
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 10),
@@ -212,14 +196,17 @@ class _ProjectCard extends StatelessWidget {
                   ),
 
                   if (item.lastSession != null) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      item.lastSession!.note,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFFAAAAAA),
-                        fontSize: 14
+                    SizedBox(
+                      height: 30,
+                      width: 200,
+                      child: Text(
+                        item.lastSession!.note,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFFAAAAAA),
+                          fontSize: 10
+                        ),
                       ),
                     ),
                   ],
@@ -236,7 +223,7 @@ class _ProjectCard extends StatelessWidget {
                       _recencyLabel,
                       style: TextStyle(
                         color: _boxColor,
-                        fontSize: 16
+                        fontSize: 13
                       )
                     ),
 

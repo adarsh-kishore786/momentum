@@ -1,8 +1,9 @@
-import 'package:momentum/data/daos/session_dao.dart';
 import 'package:momentum/data/repository.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/models/session.dart';
+import 'package:momentum/models/session_cursor.dart';
+import 'package:momentum/models/session_with_project.dart';
 
 class FakeRepository implements Repository {
   FakeRepository();
@@ -74,6 +75,18 @@ class FakeRepository implements Repository {
     throw UnimplementedError("Session deletion");
 
   @override
-  Future<List<Session>> getAllSessions({SessionCursor? after, int? limit}) =>
-    throw UnimplementedError("Fetching sessions");
+  Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit}) async {
+    final arrayMap = [
+      {
+        'id': 1,
+        'project_id': 1,
+        'date': DateTime(2026, 05, 04).millisecondsSinceEpoch,
+        'duration_minutes': 50,
+        'note': "Worked on network stack",
+        'project_name': "Beej's Computer Networking"
+      }
+    ];
+
+    return arrayMap.map(SessionWithProjectName.fromMap).toList();
+  }
 }

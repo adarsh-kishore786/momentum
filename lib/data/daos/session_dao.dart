@@ -1,16 +1,9 @@
 import 'package:momentum/data/database_exception.dart';
+import 'package:momentum/models/project.dart';
 import 'package:momentum/models/session.dart';
+import 'package:momentum/models/session_cursor.dart';
+import 'package:momentum/models/session_with_project.dart';
 import 'package:sqflite/sqflite.dart';
-
-class SessionCursor {
-  final DateTime date;
-  final int id;
-
-  const SessionCursor({
-    required this.date,
-    required this.id
-  });
-}
 
 class SessionDao {
   final Database db;
@@ -50,7 +43,7 @@ class SessionDao {
     }
   }
 
-  Future<List<Session>> getAll({
+  Future<List<SessionWithProjectName>> getAll({
       SessionCursor? after,
       int limit = 30
   }) async {
@@ -62,24 +55,33 @@ class SessionDao {
       throw ArgumentError('cursor id must be a valid number');
     }
 
+    String sql = '''
+      SELECT
+        s.${Session.primaryKey} as ${Session.primaryKey},
+        s.${Session.colProjectId} as ${Session.colProjectId},
+        s.${Session.colDate} as ${Session.colDate},
+        s.${Session.colNote} as ${Session.colNote},
+        s.${Session.colDurationMinutes} as ${Session.colDurationMinutes},
+        p.${Project.colName} as project_name
+      FROM
+        ${Session.table} s JOIN ${Project.table} p
+        ON s.${Session.colProjectId} = p.${Project.primaryKey}
+    ''';
+
+    if (after != null) {
+      sql = '''
+        $sql
+        WHERE
+          (${Session.colDate} < ${after.date.millisecondsSinceEpoch} OR
+            (${Session.colDate} = ${after.date.millisecondsSinceEpoch} AND
+              ${Session.primaryKey} < ${after.id})
+          )
+      ''';
+    }
+
     try {
-      final rows = await db.query(
-        Session.table,
-        where: after != null
-            ? '''(${Session.colDate} < ? OR (${Session.colDate} = ?
-              AND ${Session.primaryKey} < ?))''' 
-            : null,
-        whereArgs: after != null
-            ? [
-                after.date.millisecondsSinceEpoch, 
-                after.date.millisecondsSinceEpoch,
-                after.id
-              ] 
-            : null,
-        orderBy: '${Session.colDate} DESC, ${Session.primaryKey} DESC',
-        limit: limit
-      );
-      return rows.map(Session.fromMap).toList();
+      final rows = await db.rawQuery(sql);
+      return rows.map(SessionWithProjectName.fromMap).toList();
     } on DatabaseException catch (e, stack) {
       Error.throwWithStackTrace(
        MomentumDBException('Could not fetch sessions', cause: e), 

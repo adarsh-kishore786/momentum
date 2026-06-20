@@ -3,6 +3,8 @@ import 'package:momentum/data/daos/session_dao.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/models/session.dart';
+import 'package:momentum/models/session_cursor.dart';
+import 'package:momentum/models/session_with_project.dart';
 
 abstract interface class Repository {
   Future<Project> insertProject(Project project);
@@ -11,7 +13,7 @@ abstract interface class Repository {
 
   Future<Session> insertSession(Session session);
   Future<void> deleteSession(Session session);
-  Future<List<Session>> getAllSessions({SessionCursor? after, int? limit});
+  Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit});
 }
 
 class SqfliteRepository implements Repository {
@@ -46,7 +48,7 @@ class SqfliteRepository implements Repository {
     _sessionDao.delete(session);
 
   @override
-  Future<List<Session>> getAllSessions({SessionCursor? after, int? limit}) {
+  Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit}) {
     if (limit != null) {
       return _sessionDao.getAll(after: after, limit: limit);
     }
