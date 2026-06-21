@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MomentumHeader extends StatelessWidget implements PreferredSizeWidget {
   const MomentumHeader({super.key});
@@ -22,4 +23,27 @@ class MomentumHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class MomentumFooter extends StatelessWidget {
+  final StatefulNavigationShell shell;
+  const MomentumFooter({required this.shell, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: shell,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: shell.currentIndex,
+        onTap: (index) => shell.goBranch(
+          index,
+          initialLocation: index == shell.currentIndex
+        ),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: "Projects"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
+        ],
+      ),
+    );
+  }
 }

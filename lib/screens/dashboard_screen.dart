@@ -50,6 +50,7 @@ class _Dashboard extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          toolbarHeight: 0,
           backgroundColor: Colors.transparent,
           bottom: TabBar(
             labelColor: Colors.white,
