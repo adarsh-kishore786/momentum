@@ -9,6 +9,7 @@ import 'package:momentum/models/session_with_project.dart';
 abstract interface class Repository {
   Future<Project> insertProject(Project project);
   Future<void> updateProject(Project project);
+  Future<void> deleteProject(int projectId);
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession();
 
   Future<Session> insertSession(Session session);
@@ -34,6 +35,10 @@ class SqfliteRepository implements Repository {
   @override
   Future<void> updateProject(Project project) =>
     _projectDao.update(project);
+
+  @override
+  Future<void> deleteProject(int projectId) =>
+    _projectDao.delete(projectId);
 
   @override
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession() =>

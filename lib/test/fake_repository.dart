@@ -17,6 +17,10 @@ class FakeRepository implements Repository {
     throw UnimplementedError("Project updation");
 
   @override
+  Future<void> deleteProject(int projectId) async =>
+    throw UnimplementedError("Project deletion");
+
+  @override
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession() async {
     final List<Map<String, dynamic>> projectsWithLastSession = [
       {
