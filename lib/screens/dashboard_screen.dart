@@ -169,81 +169,85 @@ class _ProjectCard extends StatelessWidget {
         buttonText = "Start";
     }
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-      decoration: BoxDecoration(
-        color: boxDecorationColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: _boxColor, width: 3)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, 0, 24, 10),
+      child: InkWell(
+        onTap: () {},
+        child: Ink(
+          decoration: BoxDecoration(
+            color: boxDecorationColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border(left: BorderSide(color: _boxColor, width: 3)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.project.name,
-                    style: const TextStyle(
-                      color: Color(0xFFE8E8E8),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    )
-                  ),
 
-                  if (item.lastSession != null) ...[
-                    SizedBox(
-                      height: 30,
-                      width: 200,
-                      child: Text(
-                        item.lastSession!.note,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item.project.name,
                         style: const TextStyle(
-                          color: Color(0xFFAAAAAA),
-                          fontSize: 10
-                        ),
+                          color: Color(0xFFE8E8E8),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        )
                       ),
-                    ),
-                  ],
-                ],
-              ),
 
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                spacing: 10,
-                children: [
-                  if (status == ProjectStatus.active)
-                    Text(
-                      _recencyLabel,
-                      style: TextStyle(
-                        color: _boxColor,
-                        fontSize: 13
-                      )
-                    ),
+                      if (item.lastSession != null) ...[
+                        SizedBox(
+                          height: 30,
+                          width: 200,
+                          child: Text(
+                            item.lastSession!.note,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFFAAAAAA),
+                              fontSize: 10
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
 
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll<Color>(Color(0x20000000)),
-                      
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      buttonText,
-                    )
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    spacing: 10,
+                    children: [
+                      if (status == ProjectStatus.active)
+                        Text(
+                          _recencyLabel,
+                          style: TextStyle(
+                            color: _boxColor,
+                            fontSize: 13
+                          )
+                        ),
+
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll<Color>(Color(0x20000000)),
+                          
+                        ),
+                        onPressed: () {},
+                        child: Text(
+                          buttonText,
+                        )
+                      ),
+                    ],
                   ),
                 ],
               ),
-
             ],
           ),
-        ],
+        ),
       ),
     );
   }
