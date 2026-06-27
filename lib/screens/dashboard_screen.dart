@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/routing/routes.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -171,9 +173,9 @@ class _ProjectCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 0, 24, 10),
-      child: InkWell(
-        onTap: () {},
-        child: Ink(
+      child: GestureDetector(
+        onTap: () { context.push(Routes.project.replaceAll(":id", item.project.id!.toString())); },
+        child: Container(
           decoration: BoxDecoration(
             color: boxDecorationColor,
             borderRadius: BorderRadius.circular(14),

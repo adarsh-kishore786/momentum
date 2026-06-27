@@ -4,6 +4,7 @@ import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/commons.dart';
 import 'package:momentum/screens/dashboard_screen.dart';
 import 'package:momentum/screens/history_screen.dart';
+import 'package:momentum/screens/project_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -19,7 +20,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             GoRoute(path: Routes.history, builder: (_, _) => const HistoryScreen()),
           ])
         ]
-      ) 
+      ),
+      GoRoute(
+        path: Routes.project,
+        builder: (_, state) {
+          final projectId = int.parse(state.pathParameters['id']!);
+          return ProjectScreen(projectId: projectId);
+        }
+      ),
     ]
   );
 });
