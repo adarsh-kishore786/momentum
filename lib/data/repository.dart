@@ -10,6 +10,7 @@ abstract interface class Repository {
   Future<Project> insertProject(Project project);
   Future<void> updateProject(Project project);
   Future<void> deleteProject(int projectId);
+  Future<Project> getProjectById(int projectId);
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession();
 
   Future<Session> insertSession(Session session);
@@ -39,6 +40,10 @@ class SqfliteRepository implements Repository {
   @override
   Future<void> deleteProject(int projectId) =>
     _projectDao.delete(projectId);
+
+  @override
+  Future<Project> getProjectById(int projectId) =>
+    _projectDao.getById(projectId);
 
   @override
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession() =>
