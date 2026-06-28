@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:momentum/models/history_state.dart';
 import 'package:momentum/models/session_with_project.dart';
 import 'package:momentum/notifiers/history_notifier.dart';
+import 'package:momentum/routing/routes.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
@@ -19,7 +21,7 @@ class HistoryScreen extends ConsumerWidget {
         error: (e, _) => Center(
           child: Text(
             'Error: $e',
-            style: const TextStyle(color: Colors.red)
+            style: TextStyle(color: Theme.of(context).colorScheme.error)
           ),
         ),
         data: (historyState) => _HistoryList(historyState: historyState),
@@ -55,11 +57,13 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(width: 2, color: Colors.black),
+        border: Border.all(width: 2, color: colorScheme.surface),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -76,23 +80,32 @@ class _HistoryCard extends StatelessWidget {
                   Text(
                     sessionWithProjectName.session.date.toLocal().toString().split(' ')[0],
                     style: TextStyle(
-                      color: Colors.greenAccent
+                      color: colorScheme.secondary
                     ),
                   ),
 
                   Text(sessionWithProjectName.session.note,
-                    style: const TextStyle(
-                      color: Color(0xFFE8E8E8),
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.w600
                     )
                   ),
 
-                  Text(sessionWithProjectName.projectName,
-                    style: const TextStyle(
-                      color: Colors.green,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500
+                  GestureDetector(
+                    onTap: () {
+                      final projectId = sessionWithProjectName.session.projectId;
+                      context.push(
+                        Routes.project.replaceAll(":id", projectId.toString())
+                      );
+                    },
+                    child: Text(sessionWithProjectName.projectName,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline
+                      )
                     )
                   )
                 ],
