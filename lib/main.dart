@@ -35,8 +35,14 @@ class MomentumApp extends ConsumerWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF141414),
         colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF141414),
+          surface: Color(0xFF1C1C1C),
+          onSurface: Color(0xFFE8E8E8),
+          surfaceDim: Color(0xFF181818),
+          onSurfaceVariant: Color(0xFFAAAAAA),
           primary: Color(0xFFC8F53A),
+          secondary: Colors.white60,
+          tertiary: Colors.purple,
+          error: Colors.red,
         ),
       ),
       routerConfig: router,

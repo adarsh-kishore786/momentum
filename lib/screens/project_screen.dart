@@ -33,6 +33,16 @@ class _ProjectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(project.name);
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: Text(
+          project.name,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary
+          ),
+        ),
+      ),
+    );
   }
 }

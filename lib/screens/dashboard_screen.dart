@@ -19,7 +19,9 @@ class DashboardScreen extends ConsumerWidget {
           child: CircularProgressIndicator()
         ),
         error: (e, _) => Center(
-          child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
+          child: Text(
+            'Error: $e',
+            style: TextStyle(color: Theme.of(context).colorScheme.error)),
         ),
         data: (projects) => _Dashboard(projects: projects),
       ),
@@ -46,6 +48,8 @@ class _Dashboard extends StatelessWidget {
       (p) => p.project.status == ProjectStatus.archived
     ).toList();
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return DefaultTabController(
       initialIndex: 0,
       length: 3,
@@ -55,9 +59,9 @@ class _Dashboard extends StatelessWidget {
           toolbarHeight: 0,
           backgroundColor: Colors.transparent,
           bottom: TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white60,
-            dividerColor: Colors.purple,
+            labelColor: colorScheme.primary,
+            unselectedLabelColor: colorScheme.secondary,
+            dividerColor: colorScheme.tertiary,
             tabs: [
               Tab(text: "Active"),
               Tab(text: "Archived"),
@@ -93,7 +97,7 @@ class _ListCard extends StatelessWidget {
         child: Text(
           "No ${projectStatus.name} projects!",
           style: TextStyle(
-            color: Colors.white60,
+            color: Theme.of(context).colorScheme.secondary,
             fontSize: 20,
           ),
         ),
@@ -156,25 +160,30 @@ class _ProjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color boxDecorationColor;
     String buttonText;
+    final colorScheme = Theme.of(context).colorScheme;
 
     switch (status) {
       case ProjectStatus.active: 
-        boxDecorationColor = const Color(0xFF1C1C1C);
+        boxDecorationColor = colorScheme.surface;
         buttonText = "Log";
 
       case ProjectStatus.archived:
-        boxDecorationColor = const Color(0xFF181818);
+        boxDecorationColor = colorScheme.surfaceDim;
         buttonText = "Revive";
 
       case ProjectStatus.planned:
-        boxDecorationColor = const Color(0xFF1A1A1A);
+        boxDecorationColor = colorScheme.surfaceDim;
         buttonText = "Start";
     }
 
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 0, 24, 10),
       child: GestureDetector(
-        onTap: () { context.push(Routes.project.replaceAll(":id", item.project.id!.toString())); },
+        onTap: () {
+          context.push(
+            Routes.project.replaceAll(":id", item.project.id!.toString())
+          );
+        },
         child: Container(
           decoration: BoxDecoration(
             color: boxDecorationColor,
@@ -194,8 +203,8 @@ class _ProjectCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(item.project.name,
-                        style: const TextStyle(
-                          color: Color(0xFFE8E8E8),
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         )
@@ -209,8 +218,8 @@ class _ProjectCard extends StatelessWidget {
                             item.lastSession!.note,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFFAAAAAA),
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
                               fontSize: 10
                             ),
                           ),
@@ -235,8 +244,9 @@ class _ProjectCard extends StatelessWidget {
 
                       TextButton(
                         style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll<Color>(Color(0x20000000)),
-                          
+                          backgroundColor: WidgetStatePropertyAll<Color>(
+                            colorScheme.surface
+                          ),
                         ),
                         onPressed: () {},
                         child: Text(
