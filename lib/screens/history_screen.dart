@@ -37,6 +37,18 @@ class _HistoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (historyState.sessions.isEmpty) {
+      return Center(
+        child: Text(
+          "No sessions!",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.secondary,
+            fontSize: 20,
+          ),
+        ),
+      );
+    }
+
     return CustomScrollView(
       slivers: [
         SliverList(

@@ -16,7 +16,8 @@ class ProjectScreen extends ConsumerWidget {
       child: state.when(
         data: (project) => _ProjectScreen(project: project),
         error: (e, _) => Center(
-          child: Text("Error: $e", style: const TextStyle(color: Colors.red)),
+          child: Text(
+            "Error: $e", style: const TextStyle(color: Colors.red)),
         ),
         loading: () => const Center(
           child: CircularProgressIndicator()

@@ -27,7 +27,7 @@ class Project {
     this.id,
     required this.name,
     required this.description,
-    this.status = ProjectStatus.active,
+    this.status = ProjectStatus.planned,
   }) : assert(name.isNotEmpty, 'Project name cannot be empty');
 
   factory Project.fromMap(Map<String, dynamic> map) {

@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:momentum/providers/providers.dart';
 import 'package:momentum/routing/router.dart';
-import 'package:momentum/test/fake_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -15,9 +13,6 @@ void main() {
 
   runApp(
     ProviderScope(
-      overrides: [
-        repositoryProvider.overrideWithValue(FakeRepository()),
-      ],
       child: const MomentumApp(),
     ),
   );

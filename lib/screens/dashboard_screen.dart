@@ -5,6 +5,7 @@ import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/routing/routes.dart';
+import 'package:momentum/screens/add_project.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -80,7 +81,11 @@ class _Dashboard extends StatelessWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => const AddProjectSheet(),
+          ),
           backgroundColor: colorScheme.primary,
           child: Icon(Icons.add),
         ),
