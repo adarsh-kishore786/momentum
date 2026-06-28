@@ -79,6 +79,11 @@ class _Dashboard extends StatelessWidget {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: colorScheme.primary,
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
