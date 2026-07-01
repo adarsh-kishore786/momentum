@@ -15,6 +15,7 @@ abstract interface class Repository {
 
   Future<Session> insertSession(Session session);
   Future<void> deleteSession(Session session);
+  Future<List<Session>> getProjectSessions(int projectId);
   Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit});
 }
 
@@ -64,4 +65,8 @@ class SqfliteRepository implements Repository {
     }
     return _sessionDao.getAll(after: after);
   }
+
+  @override
+  Future<List<Session>> getProjectSessions(int projectId) =>
+    _sessionDao.getProjectSessions(projectId);
 }

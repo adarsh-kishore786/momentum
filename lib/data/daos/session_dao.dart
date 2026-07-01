@@ -43,6 +43,23 @@ class SessionDao {
     }
   }
 
+  Future<List<Session>> getProjectSessions(int projectId) async {
+    try {
+      final result = await db.query(
+        Session.table,
+        where: '${Session.colProjectId} = ?',
+        whereArgs: [projectId]
+      );
+      return result.map(Session.fromMap).toList();
+
+    } on DatabaseException catch (e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Failed to delete sessions', cause: e),
+        stack
+      );
+    }
+  }
+
   Future<List<SessionWithProjectName>> getAll({
       SessionCursor? after,
       int limit = 30

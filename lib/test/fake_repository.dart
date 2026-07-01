@@ -105,4 +105,8 @@ class FakeRepository implements Repository {
 
     return arrayMap.map(SessionWithProjectName.fromMap).toList();
   }
+
+  @override
+  Future<List<Session>> getProjectSessions(int projectId) async =>
+    throw UnimplementedError("Fetching sessions for a project");
 }
