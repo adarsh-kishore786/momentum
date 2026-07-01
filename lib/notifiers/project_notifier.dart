@@ -13,9 +13,11 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
 
   @override
   FutureOr<ProjectDetail> build() async {
+    final repository = ref.watch(repositoryProvider);
+
     final results = await Future.wait([
-      ref.watch(repositoryProvider).getProjectById(projectId),
-      ref.watch(repositoryProvider).getProjectSessions(projectId)
+      repository.getProjectById(projectId),
+      repository.getProjectSessions(projectId)
     ]);
 
     return ProjectDetail(
