@@ -6,7 +6,7 @@ class MomentumField extends StatelessWidget {
     required this.controller,
     required this.label,
     this.autofocus = false,
-    this.maxLines = 1,
+    this.maxLines = 2,
     this.keyBoardType = TextInputType.text,
     this.errorText,
     super.key

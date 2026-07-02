@@ -241,7 +241,7 @@ class _ProjectCard extends StatelessWidget {
 
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     spacing: 10,
                     children: [
                       if (status == ProjectStatus.active)

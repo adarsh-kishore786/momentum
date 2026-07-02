@@ -85,45 +85,49 @@ class _HistoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sessionWithProjectName.session.date.toLocal().toString().split(' ')[0],
-                    style: TextStyle(
-                      color: colorScheme.secondary
-                    ),
-                  ),
-
-                  Text(sessionWithProjectName.session.note,
-                    style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600
-                    )
-                  ),
-
-                  GestureDetector(
-                    onTap: () {
-                      final projectId = sessionWithProjectName.session.projectId;
-                      context.push(
-                        Routes.project.replaceAll(":id", projectId.toString())
-                      );
-                    },
-                    child: Text(sessionWithProjectName.projectName,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sessionWithProjectName.session.date.toLocal().toString().split(' ')[0],
                       style: TextStyle(
-                        color: colorScheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline
+                        color: colorScheme.secondary
+                      ),
+                    ),
+
+                    Text(sessionWithProjectName.session.note,
+                      maxLines: 5,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600
+                      )
+                    ),
+
+                    GestureDetector(
+                      onTap: () {
+                        final projectId = sessionWithProjectName.session.projectId;
+                        context.push(
+                          Routes.project.replaceAll(":id", projectId.toString())
+                        );
+                      },
+                      child: Text(sessionWithProjectName.projectName,
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline
+                        )
                       )
                     )
-                  )
-                ],
+                  ],
+                ),
               ),
 
-              Text("${sessionWithProjectName.session.durationMinutes} minutes",
+              Text("${sessionWithProjectName.session.durationMinutes} mins",
                 style: const TextStyle(
                   color: Colors.blue,
                   fontSize: 15,
