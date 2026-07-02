@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
+import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/screens/commons.dart';
 
 class AddSession extends ConsumerStatefulWidget {
@@ -16,7 +17,7 @@ class AddSession extends ConsumerStatefulWidget {
 class _AddSession extends ConsumerState<AddSession> {
   final _durationController = TextEditingController();
   final _notesController = TextEditingController();
-  DateTime? _selectedDate;
+  DateTime _selectedDate = DateTime.now();
 
   bool _saving = false;
   String? _durationError;
@@ -44,6 +45,22 @@ class _AddSession extends ConsumerState<AddSession> {
       return;
     }
 
+    try {
+      await ref.read(dashboardProvider.notifier).logSession(
+        duration,
+        notes,
+        _selectedDate.toUtc(),
+        widget.project.id!
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      if (mounted) {
+        setState(() { 
+          _saving = false;
+          _saveError = 'Failed to log session. $e\nTry again.';
+        });
+      }
+    }
   }
 
   @override
@@ -76,7 +93,7 @@ class _AddSession extends ConsumerState<AddSession> {
           ),
 
           Text(
-            'Log session',
+            'Log session for ${widget.project.name}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -103,7 +120,7 @@ class _AddSession extends ConsumerState<AddSession> {
           ),
 
           MomentumDateSelector(
-            initialDate: DateTime.now(),
+            initialDate: _selectedDate,
             onDateSelected: (newDate) {
               setState(() {
                 _selectedDate = newDate;
@@ -114,10 +131,18 @@ class _AddSession extends ConsumerState<AddSession> {
           const SizedBox(height: 24),
 
           SaveButton(
-            type: 'session',
+            saveText: 'Log session',
             saving: _saving,
             save: _save,
-          )
+          ),
+
+          if (_saveError != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              _saveError!,
+              style: TextStyle(fontSize: 13, color: cs.error),
+            ),
+          ],
         ],
       ),
     );

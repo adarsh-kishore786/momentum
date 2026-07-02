@@ -189,7 +189,7 @@ class _EmptySessionsSliver extends StatelessWidget {
       hasScrollBody: false,
       child: Center(
         child: Text(
-          'No sessions yet.\nTap + to log your first.',
+          'No sessions yet.',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,

@@ -105,6 +105,14 @@ class _AddProject extends ConsumerState<AddProject> {
             maxLines: 3,
           ),
 
+          const SizedBox(height: 24),
+
+          SaveButton(
+            saveText: 'Save project',
+            saving: _saving,
+            save: _save
+          ),
+
           if (_saveError != null) ...[
             const SizedBox(height: 12),
             Text(
@@ -112,14 +120,6 @@ class _AddProject extends ConsumerState<AddProject> {
               style: TextStyle(fontSize: 13, color: cs.error),
             ),
           ],
-
-          const SizedBox(height: 24),
-
-          SaveButton(
-            type: 'project',
-            saving: _saving,
-            save: _save
-          )
         ],
       ),
     );

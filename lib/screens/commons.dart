@@ -58,7 +58,6 @@ class MomentumField extends StatelessWidget {
 }
 
 class MomentumDateSelector extends ConsumerStatefulWidget {
-  // Pass a callback function from the parent
   final ValueChanged<DateTime> onDateSelected;
   final String? errorText;
   final DateTime? initialDate;
@@ -117,12 +116,12 @@ class _MomentumDateSelectorState extends ConsumerState<MomentumDateSelector> {
 }
 
 class SaveButton extends StatelessWidget {
-  final String type;
+  final String saveText;
   final bool saving;
   final Future<void> Function() save;
 
   const SaveButton({
-    required this.type,
+    required this.saveText,
     required this.saving,
     required this.save,
     super.key
@@ -146,7 +145,7 @@ class SaveButton extends StatelessWidget {
           ),
         ),
         child: Text(
-          saving ? 'Saving…' : 'Save $type',
+          saving ? 'Saving…' : saveText,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             letterSpacing: 0.04,
