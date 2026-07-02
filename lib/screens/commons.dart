@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MomentumField extends StatelessWidget {
   const MomentumField({
@@ -6,6 +7,7 @@ class MomentumField extends StatelessWidget {
     required this.label,
     this.autofocus = false,
     this.maxLines = 1,
+    this.keyBoardType = TextInputType.text,
     this.errorText,
     super.key
   });
@@ -15,6 +17,7 @@ class MomentumField extends StatelessWidget {
   final bool autofocus;
   final int maxLines;
   final String? errorText;
+  final TextInputType keyBoardType;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +27,7 @@ class MomentumField extends StatelessWidget {
       controller: controller,
       autofocus: autofocus,
       maxLines: maxLines,
+      keyboardType: keyBoardType,
       style: TextStyle(fontSize: 14, color: cs.onSurface),
       decoration: InputDecoration(
         labelText: label,
@@ -47,6 +51,106 @@ class MomentumField extends StatelessWidget {
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: cs.error),
+        ),
+      ),
+    );
+  }
+}
+
+class MomentumDateSelector extends ConsumerStatefulWidget {
+  // Pass a callback function from the parent
+  final ValueChanged<DateTime> onDateSelected;
+  final String? errorText;
+  final DateTime? initialDate;
+
+  const MomentumDateSelector({
+    required this.onDateSelected,
+    this.initialDate,
+    this.errorText = '',
+    super.key,
+  });
+
+  @override
+  ConsumerState<MomentumDateSelector> createState() => _MomentumDateSelectorState();
+}
+
+class _MomentumDateSelectorState extends ConsumerState<MomentumDateSelector> {
+  DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with a date if passed from the parent
+    _selectedDate = widget.initialDate;
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+      // Send the selected date back up to the parent
+      widget.onDateSelected(picked);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText = _selectedDate == null
+        ? 'Select Date'
+        : '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+
+    return ListTile(
+      title: const Text('Date'),
+      subtitle: Text(dateText),
+      trailing: const Icon(Icons.calendar_today),
+      onTap: () => _selectDate(context),
+    );
+  }
+}
+
+class SaveButton extends StatelessWidget {
+  final String type;
+  final bool saving;
+  final Future<void> Function() save;
+
+  const SaveButton({
+    required this.type,
+    required this.saving,
+    required this.save,
+    super.key
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: saving ? null : save,
+        style: FilledButton.styleFrom(
+          backgroundColor: cs.primary,
+          foregroundColor: const Color(0xFF0F0F0F),
+          disabledBackgroundColor: cs.primary.withValues(alpha: 0.4),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        child: Text(
+          saving ? 'Saving…' : 'Save $type',
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.04,
+          ),
         ),
       ),
     );

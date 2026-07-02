@@ -115,28 +115,11 @@ class _AddProject extends ConsumerState<AddProject> {
 
           const SizedBox(height: 24),
 
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: _saving ? null : _save,
-              style: FilledButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: const Color(0xFF0F0F0F),
-                disabledBackgroundColor: cs.primary.withValues(alpha: 0.4),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: Text(
-                _saving ? 'Saving…' : 'Save project',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.04,
-                ),
-              ),
-            ),
-          ),
+          SaveButton(
+            type: 'project',
+            saving: _saving,
+            save: _save
+          )
         ],
       ),
     );

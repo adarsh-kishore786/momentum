@@ -14,7 +14,37 @@ class AddSession extends ConsumerStatefulWidget {
 }
 
 class _AddSession extends ConsumerState<AddSession> {
-  final _nameController = TextEditingController();
+  final _durationController = TextEditingController();
+  final _notesController = TextEditingController();
+  DateTime? _selectedDate;
+
+  bool _saving = false;
+  String? _durationError;
+  String? _notesError;
+  String? _saveError;
+
+  @override
+  void dispose() {
+    _durationController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final int? duration = int.tryParse(_durationController.text.trim());
+    final notes = _notesController.text.trim();
+
+    if (duration == 0 || duration == null) {
+      setState(() => _durationError = 'Duration must be valid');
+      return;
+    }
+
+    if (notes.isEmpty) {
+      setState(() => _notesError = 'Notes cannot be empty');
+      return;
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +87,36 @@ class _AddSession extends ConsumerState<AddSession> {
           const SizedBox(height: 20),
 
           MomentumField(
-            controller: _nameController,
-            label: widget.project.name,
+            controller: _durationController,
+            label: 'Duration (min)',
+            autofocus: true,
+            keyBoardType: TextInputType.numberWithOptions(decimal: false, signed: false),
+            errorText: _durationError,
+          ),
+
+          const SizedBox(height: 20),
+
+          MomentumField(
+            controller: _notesController,
+            label: 'Notes',
+            errorText: _notesError,
+          ),
+
+          MomentumDateSelector(
+            initialDate: DateTime.now(),
+            onDateSelected: (newDate) {
+              setState(() {
+                _selectedDate = newDate;
+              });
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          SaveButton(
+            type: 'session',
+            saving: _saving,
+            save: _save,
           )
         ],
       ),
