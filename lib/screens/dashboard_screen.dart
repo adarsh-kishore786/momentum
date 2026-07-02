@@ -6,6 +6,7 @@ import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/add_project.dart';
+import 'package:momentum/screens/add_session.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -84,7 +85,7 @@ class _Dashboard extends StatelessWidget {
           onPressed: () => showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (_) => const AddProjectSheet(),
+            builder: (_) => const AddProject(),
           ),
           backgroundColor: colorScheme.primary,
           child: Icon(Icons.add),
@@ -258,7 +259,11 @@ class _ProjectCard extends StatelessWidget {
                             colorScheme.surface
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => AddSession(project: item.project)
+                        ),
                         child: Text(
                           buttonText,
                         )

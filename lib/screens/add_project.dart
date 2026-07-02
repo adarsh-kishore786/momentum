@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/screens/commons.dart';
 
-class AddProjectSheet extends ConsumerStatefulWidget {
-  const AddProjectSheet({super.key});
+class AddProject extends ConsumerStatefulWidget {
+  const AddProject({super.key});
 
   @override
-  ConsumerState<AddProjectSheet> createState() => _AddProjectSheetState();
+  ConsumerState<AddProject> createState() => _AddProject();
 }
 
-class _AddProjectSheetState extends ConsumerState<AddProjectSheet> {
+class _AddProject extends ConsumerState<AddProject> {
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
   bool _saving = false;
@@ -91,14 +92,14 @@ class _AddProjectSheetState extends ConsumerState<AddProjectSheet> {
           ),
           const SizedBox(height: 20),
 
-          _MomentumField(
+          MomentumField(
             controller: _nameController,
             label: 'Name',
             autofocus: true,
             errorText: _nameError,
           ),
           const SizedBox(height: 12),
-          _MomentumField(
+          MomentumField(
             controller: _descController,
             label: 'Description',
             maxLines: 3,
@@ -142,54 +143,3 @@ class _AddProjectSheetState extends ConsumerState<AddProjectSheet> {
   }
 }
 
-class _MomentumField extends StatelessWidget {
-  const _MomentumField({
-    required this.controller,
-    required this.label,
-    this.autofocus = false,
-    this.maxLines = 1,
-    this.errorText,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final bool autofocus;
-  final int maxLines;
-  final String? errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return TextField(
-      controller: controller,
-      autofocus: autofocus,
-      maxLines: maxLines,
-      style: TextStyle(fontSize: 14, color: cs.onSurface),
-      decoration: InputDecoration(
-        labelText: label,
-        errorText: errorText,
-        labelStyle: TextStyle(color: cs.onSurfaceVariant),
-        filled: true,
-        fillColor: const Color(0xFF141414),
-        errorStyle: TextStyle(color: cs.error),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF252525)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: cs.primary),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: cs.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: cs.error),
-        ),
-      ),
-    );
-  }
-}
