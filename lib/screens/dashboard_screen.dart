@@ -66,18 +66,21 @@ class _Dashboard extends StatelessWidget {
             dividerColor: colorScheme.tertiary,
             tabs: [
               Tab(text: "Active"),
+              Tab(text: "Planned"),
               Tab(text: "Archived"),
-              Tab(text: "Planned")
             ],
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: EdgeInsets.only(
+            top: 10,
+            bottom: 56 + 16 + MediaQuery.of(context).padding.bottom,
+          ),
           child: TabBarView(
             children: [
               _ListCard(projects: active, projectStatus: ProjectStatus.active),
-              _ListCard(projects: archived, projectStatus: ProjectStatus.archived),
               _ListCard(projects: planned, projectStatus: ProjectStatus.planned),
+              _ListCard(projects: archived, projectStatus: ProjectStatus.archived),
             ],
           ),
         ),
