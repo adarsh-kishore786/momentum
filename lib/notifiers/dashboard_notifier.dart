@@ -5,6 +5,8 @@ import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/models/session.dart';
+import 'package:momentum/notifiers/history_notifier.dart';
+import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/providers/providers.dart';
 
 class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
@@ -36,6 +38,8 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
       await ref.read(repositoryProvider).updateProject(project.copyWith(status: ProjectStatus.active));
     }
     await ref.read(repositoryProvider).insertSession(session);
+    ref.invalidate(historyProvider);
+    ref.invalidate(projectProvider);
     ref.invalidateSelf();
   }
 }
