@@ -27,5 +27,5 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 }
 
-final projectNotifier = AsyncNotifierProvider.family<ProjectNotifier, ProjectDetail, int>
+final projectProvider = AsyncNotifierProvider.family<ProjectNotifier, ProjectDetail, int>
   (ProjectNotifier.new);

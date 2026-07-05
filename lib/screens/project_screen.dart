@@ -15,7 +15,7 @@ class ProjectScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(projectNotifier(projectId));
+    final state = ref.watch(projectProvider(projectId));
 
     return Scaffold(
       body: state.when(
@@ -26,8 +26,6 @@ class ProjectScreen extends ConsumerWidget {
     );
   }
 }
-
-// ── Loading ──────────────────────────────────────────────────────────────────
 
 class _LoadingBody extends StatelessWidget {
   const _LoadingBody();
