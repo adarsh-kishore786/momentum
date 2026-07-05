@@ -48,7 +48,8 @@ class SessionDao {
       final result = await db.query(
         Session.table,
         where: '${Session.colProjectId} = ?',
-        whereArgs: [projectId]
+        whereArgs: [projectId],
+        orderBy: '${Session.colDate} DESC',
       );
       return result.map(Session.fromMap).toList();
 
@@ -83,15 +84,17 @@ class SessionDao {
       FROM
         ${Session.table} s JOIN ${Project.table} p
         ON s.${Session.colProjectId} = p.${Project.primaryKey}
+      ORDER BY
+        s.${Session.colDate} DESC
     ''';
 
     if (after != null) {
       sql = '''
         $sql
         WHERE
-          (${Session.colDate} < ${after.date.millisecondsSinceEpoch} OR
+          (${Session.colDate} > ${after.date.millisecondsSinceEpoch} OR
             (${Session.colDate} = ${after.date.millisecondsSinceEpoch} AND
-              ${Session.primaryKey} < ${after.id})
+              ${Session.primaryKey} > ${after.id})
           )
       ''';
     }
