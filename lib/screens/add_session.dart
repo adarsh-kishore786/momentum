@@ -116,6 +116,7 @@ class _AddSession extends ConsumerState<AddSession> {
           MomentumField(
             controller: _notesController,
             label: 'Notes',
+            maxLines: 2,
             errorText: _notesError,
           ),
 
