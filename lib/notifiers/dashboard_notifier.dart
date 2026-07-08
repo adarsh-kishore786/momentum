@@ -33,11 +33,15 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
     );
 
     final project = await ref.read(repositoryProvider).getProjectById(projectId);
+    if (!ref.mounted) return;
 
     if (project.status != ProjectStatus.active) {
       await ref.read(repositoryProvider).updateProject(project.copyWith(status: ProjectStatus.active));
+      if (!ref.mounted) return;
     }
     await ref.read(repositoryProvider).insertSession(session);
+    if (!ref.mounted) return;
+
     ref.invalidate(historyProvider);
     ref.invalidate(projectProvider);
     ref.invalidateSelf();
