@@ -4,16 +4,45 @@ import 'package:go_router/go_router.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/add_project.dart';
 import 'package:momentum/screens/add_session.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
+  with SingleTickerProviderStateMixin {
+
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
+
+    ref.listen<int>(projectTabResetProvider, (prev, next) {
+      _tabController.animateTo(0);
+    });
 
     return SafeArea(
       child: state.when(
@@ -25,7 +54,7 @@ class DashboardScreen extends ConsumerWidget {
             'Error: $e',
             style: TextStyle(color: Theme.of(context).colorScheme.error)),
         ),
-        data: (projects) => _Dashboard(projects: projects),
+        data: (projects) => _Dashboard(projects: projects, tabController: _tabController),
       ),
     );
   }
@@ -33,8 +62,9 @@ class DashboardScreen extends ConsumerWidget {
 
 class _Dashboard extends StatelessWidget {
   final List<ProjectWithLastSession> projects;
+  final TabController tabController;
 
-  const _Dashboard({required this.projects});
+  const _Dashboard({required this.projects, required this.tabController});
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +82,12 @@ class _Dashboard extends StatelessWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
 
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 3,
+    return PopScope(
+      canPop: tabController.index == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        tabController.animateTo(0);
+      },
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -63,6 +96,7 @@ class _Dashboard extends StatelessWidget {
           bottom: TabBar(
             labelColor: colorScheme.primary,
             unselectedLabelColor: colorScheme.secondary,
+            controller: tabController,
             dividerColor: colorScheme.tertiary,
             tabs: [
               Tab(text: "Active"),
@@ -77,6 +111,7 @@ class _Dashboard extends StatelessWidget {
             bottom: 56 + 16 + MediaQuery.of(context).padding.bottom,
           ),
           child: TabBarView(
+            controller: tabController,
             children: [
               _ListCard(projects: active, projectStatus: ProjectStatus.active),
               _ListCard(projects: planned, projectStatus: ProjectStatus.planned),

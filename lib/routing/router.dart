@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/dashboard_screen.dart';
 import 'package:momentum/screens/history_screen.dart';
 import 'package:momentum/screens/project_screen.dart';
 
-class MomentumFooter extends StatelessWidget {
+class MomentumFooter extends ConsumerWidget {
   final Widget child;
   final String currentPath;
 
   const MomentumFooter({required this.child, required this.currentPath, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isHistory = currentPath == Routes.history;
     
     return Scaffold(
@@ -23,8 +24,12 @@ class MomentumFooter extends StatelessWidget {
         onTap: (index) {
           if (index == 1 && !isHistory) {
             context.push(Routes.history);
-          } else if (index != 1 && isHistory) {
-            context.canPop() ? context.pop() : context.go(Routes.dashboard);
+          } else if (index == 0) {
+            if (isHistory) {
+              context.canPop() ? context.pop() : context.go(Routes.dashboard);
+            } else {
+              ref.read(projectTabResetProvider.notifier).state++;
+            }
           }
         },
         items: [
