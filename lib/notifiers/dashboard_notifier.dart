@@ -11,8 +11,8 @@ import 'package:momentum/providers/providers.dart';
 
 class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
   @override
-  FutureOr<List<ProjectWithLastSession>> build() {
-    final repository = ref.watch(repositoryProvider);
+  FutureOr<List<ProjectWithLastSession>> build() async {
+    final repository = await ref.watch(repositoryProvider.future);
     return repository.getProjectsWithLastSession();
   }
 
@@ -20,7 +20,9 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
 
   Future<void> insertProject(String name, String description) async {
     final project = Project(name: name, description: description);
-    await ref.read(repositoryProvider).insertProject(project);
+    final repository = await ref.read(repositoryProvider.future);
+    await repository.insertProject(project);
+
     ref.invalidateSelf();
   }
 
@@ -32,14 +34,15 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
       note: notes
     );
 
-    final project = await ref.read(repositoryProvider).getProjectById(projectId);
+    final repository = await ref.read(repositoryProvider.future);
+    final project = await repository.getProjectById(projectId);
     if (!ref.mounted) return;
 
     if (project.status != ProjectStatus.active) {
-      await ref.read(repositoryProvider).updateProject(project.copyWith(status: ProjectStatus.active));
+      await repository.updateProject(project.copyWith(status: ProjectStatus.active));
       if (!ref.mounted) return;
     }
-    await ref.read(repositoryProvider).insertSession(session);
+    await repository.insertSession(session);
     if (!ref.mounted) return;
 
     ref.invalidate(historyProvider);

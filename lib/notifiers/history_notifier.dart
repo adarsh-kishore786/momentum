@@ -17,9 +17,8 @@ class HistoryNotifier extends AsyncNotifier<HistoryState> {
   }
 
   FutureOr<HistoryState> _fetch() async {
-    final sessions = await ref
-      .read(repositoryProvider)
-      .getAllSessions(after: _cursor);
+    final repository = await ref.read(repositoryProvider.future); 
+    final sessions = await repository.getAllSessions(after: _cursor);
 
     if (sessions.isNotEmpty) {
       final last = sessions.last;

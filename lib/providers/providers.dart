@@ -10,20 +10,20 @@ final databaseProvider = FutureProvider<Database>((ref) {
 });
 
 // Dao Providers
-final projectDaoProvider = Provider<ProjectDao>((ref) {
-  final db = ref.watch(databaseProvider).requireValue;
+final projectDaoProvider = FutureProvider<ProjectDao>((ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return ProjectDao(db: db);
 });
 
-final sessionDaoProvider = Provider<SessionDao>((ref) {
-  final db = ref.watch(databaseProvider).requireValue;
+final sessionDaoProvider = FutureProvider<SessionDao>((ref) async {
+  final db = await ref.watch(databaseProvider.future);
   return SessionDao(db: db);
 });
 
 // Repository Provider
-final repositoryProvider = Provider<Repository>((ref) {
+final repositoryProvider = FutureProvider<Repository>((ref) async {
   return SqfliteRepository(
-    projectDao: ref.watch(projectDaoProvider),
-    sessionDao: ref.watch(sessionDaoProvider)
+    projectDao: await ref.watch(projectDaoProvider.future),
+    sessionDao: await ref.watch(sessionDaoProvider.future)
   );
 });
