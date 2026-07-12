@@ -7,6 +7,7 @@ class MomentumField extends StatelessWidget {
     required this.label,
     this.autofocus = false,
     this.maxLines = 1,
+    this.textCapitalization = TextCapitalization.sentences,
     this.keyBoardType = TextInputType.text,
     this.errorText,
     super.key
@@ -18,6 +19,7 @@ class MomentumField extends StatelessWidget {
   final int maxLines;
   final String? errorText;
   final TextInputType keyBoardType;
+  final TextCapitalization textCapitalization;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class MomentumField extends StatelessWidget {
       autofocus: autofocus,
       maxLines: maxLines,
       keyboardType: keyBoardType,
+      textCapitalization: textCapitalization,
       style: TextStyle(fontSize: 14, color: cs.onSurface),
       decoration: InputDecoration(
         labelText: label,

@@ -125,4 +125,3 @@ class _AddProject extends ConsumerState<AddProject> {
     );
   }
 }
-
