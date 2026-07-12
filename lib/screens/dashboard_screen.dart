@@ -294,7 +294,7 @@ class _ProjectCard extends StatelessWidget {
                       TextButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll<Color>(
-                            colorScheme.surface
+                            colorScheme.primary.withValues(alpha: 0.2)
                           ),
                         ),
                         onPressed: () => showModalBottomSheet(
