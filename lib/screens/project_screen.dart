@@ -4,6 +4,7 @@ import 'package:momentum/models/project.dart';
 import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
+import 'package:momentum/screens/add_session.dart';
 
 class ProjectScreen extends ConsumerWidget {
   const ProjectScreen({
@@ -21,7 +22,18 @@ class ProjectScreen extends ConsumerWidget {
       body: state.when(
         loading: () => const _LoadingBody(),
         error: (e, _) => _ErrorBody(error: e),
-        data: (data) => _DetailBody(project: data.project, sessions: data.sessions),
+        data: (data) => Scaffold(
+          body: _DetailBody(project: data.project, sessions: data.sessions),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => AddSession(project: data.project),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Icon(Icons.add),
+          ),
+        )
       ),
     );
   }
@@ -292,37 +304,5 @@ class _SessionTile extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-// ── FAB wrapper — sits outside the scroll view ────────────────────────────────
-// Wrap ProjectDetailScreen in a Scaffold at the route level with this FAB,
-// or include it here as floatingActionButton on an outer Scaffold.
-
-class ProjectDetailRoute extends ConsumerWidget {
-  const ProjectDetailRoute({super.key, required this.project});
-
-  final Project project;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: ProjectScreen(projectId: project.id!),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openLogSession(context, ref, project),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: const Color(0xFF0F0F0F),
-        label: const Text(
-          '+ Log session',
-          style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.04),
-        ),
-      ),
-    );
-  }
-
-  void _openLogSession(BuildContext context, WidgetRef ref, Project project) {
-    // Wire to your LogSessionSheet/Screen in Module 04.
-    // On completion, call:
-    // ref.read(projectDetailNotifierProvider(project.id!).notifier).addSession(session);
   }
 }
