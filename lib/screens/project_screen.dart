@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
+import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
@@ -159,11 +160,43 @@ class _DetailAppBar extends ConsumerWidget {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.archive),
-          color: cs.onSurface,
-          onPressed: () {},
-        ),
+        if (project!.status != ProjectStatus.archived) 
+          IconButton(
+            icon: const Icon(Icons.archive),
+            color: cs.onSurface,
+            onPressed: () async {
+              await ref.read(projectProvider(project!.id!).notifier).archive();
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Project archived.")
+                ),
+              );
+
+              Navigator.of(context).pop();
+            },
+          ),
+
+        if (project!.status == ProjectStatus.archived)
+          IconButton(
+            icon: const Icon(Icons.unarchive),
+            color: cs.onSurface,
+            onPressed: () async {
+              await ref.read(projectProvider(project!.id!).notifier).unarchive();
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Project unarchived.")
+                ),
+              );
+
+              Navigator.of(context).pop();
+            },
+          ),
 
         IconButton(
           icon: const Icon(Icons.delete),

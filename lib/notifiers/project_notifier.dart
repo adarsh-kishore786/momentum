@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_detail.dart';
+import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/notifiers/history_notifier.dart';
@@ -30,12 +31,41 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
 
   Future<void> delete() async {
     final repository = await ref.watch(repositoryProvider.future);
+    if (!ref.mounted) return;
 
     await repository.deleteProject(projectId);
     if (!ref.mounted) return;
 
     ref.invalidate(dashboardProvider);
     ref.invalidate(historyProvider);
+    ref.invalidateSelf();
+  }
+
+  Future<void> archive() async {
+    final repository = await ref.watch(repositoryProvider.future);
+    final project = await repository.getProjectById(projectId);
+    if (!ref.mounted) return;
+
+    if (project.status != ProjectStatus.archived) {
+      await repository.updateProject(project.copyWith(status: ProjectStatus.archived));
+      if (!ref.mounted) return;
+    }
+
+    ref.invalidate(dashboardProvider);
+    ref.invalidateSelf();
+  }
+
+  Future<void> unarchive() async {
+    final repository = await ref.watch(repositoryProvider.future);
+    final project = await repository.getProjectById(projectId);
+    if (!ref.mounted) return;
+
+    if (project.status == ProjectStatus.archived) {
+      await repository.updateProject(project.copyWith(status: ProjectStatus.active));
+      if (!ref.mounted) return;
+    }
+
+    ref.invalidate(dashboardProvider);
     ref.invalidateSelf();
   }
 }
