@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_detail.dart';
 import 'package:momentum/models/session.dart';
+import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/notifiers/history_notifier.dart';
 import 'package:momentum/providers/providers.dart';
 
 class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
@@ -24,6 +26,17 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
       project: results[0] as Project,
       sessions: results[1] as List<Session>
     );
+  }
+
+  Future<void> delete() async {
+    final repository = await ref.watch(repositoryProvider.future);
+
+    await repository.deleteProject(projectId);
+    if (!ref.mounted) return;
+
+    ref.invalidate(dashboardProvider);
+    ref.invalidate(historyProvider);
+    ref.invalidateSelf();
   }
 }
 

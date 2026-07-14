@@ -158,3 +158,35 @@ class SaveButton extends StatelessWidget {
     );
   }
 }
+
+Future<bool?> confirmDelete(BuildContext context) {
+  final cs = Theme.of(context).colorScheme;
+
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this project?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false), // Returns false
+            style: TextButton.styleFrom(
+              foregroundColor: cs.onSurface,
+              backgroundColor: cs.secondary
+            ),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true), // Returns true
+            style: TextButton.styleFrom(
+              foregroundColor: cs.onSurface,
+              backgroundColor: cs.error
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      );
+    },
+  );
+}

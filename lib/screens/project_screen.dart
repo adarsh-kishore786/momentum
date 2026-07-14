@@ -5,6 +5,7 @@ import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/screens/add_session.dart';
+import 'package:momentum/screens/commons.dart';
 
 class ProjectScreen extends ConsumerWidget {
   const ProjectScreen({
@@ -87,14 +88,14 @@ class _ErrorBody extends StatelessWidget {
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-class _DetailBody extends StatelessWidget {
+class _DetailBody extends ConsumerWidget {
   const _DetailBody({required this.project, required this.sessions});
 
   final Project project;
   final List<Session> sessions;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
 
     return CustomScrollView(
@@ -138,14 +139,14 @@ class _DetailBody extends StatelessWidget {
 
 // ── App bar ───────────────────────────────────────────────────────────────────
 
-class _DetailAppBar extends StatelessWidget {
+class _DetailAppBar extends ConsumerWidget {
   const _DetailAppBar({required this.project, required this.sessions});
 
   final Project? project;
   final List<Session> sessions;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
 
     return SliverAppBar(
@@ -157,6 +158,29 @@ class _DetailAppBar extends StatelessWidget {
         color: cs.onSurfaceVariant,
         onPressed: () => Navigator.of(context).pop(),
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.archive),
+          color: cs.onSurface,
+          onPressed: () {},
+        ),
+
+        IconButton(
+          icon: const Icon(Icons.delete),
+          color: cs.error,
+          onPressed: () async {
+            bool? confirm = await confirmDelete(context);
+
+            if (confirm == true) {
+              await ref.read(projectProvider(project!.id!).notifier).delete();
+              
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
+          },
+        ),
+      ],
     );
   }
 }
