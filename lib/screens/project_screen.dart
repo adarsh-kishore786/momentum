@@ -108,13 +108,23 @@ class _DetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  project.name,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                    letterSpacing: -0.02,
+                Text.rich(
+                  TextSpan(
+                    text: project.name,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: cs.onSurface,
+                      letterSpacing: -0.02,
+                    ),
+                    children: <InlineSpan>[
+                      if (project.status == ProjectStatus.archived)
+                        TextSpan(
+                          text: " (archived)",
+                          style: TextStyle(color: cs.error, fontSize: 18)
+                        )
+
+                    ]
                   ),
                 ),
                 if (project.description.isNotEmpty) ...[
