@@ -131,7 +131,6 @@ class ProjectDao {
           ORDER BY ${Session.colDate} DESC
           LIMIT 1
         )
-      WHERE p.${Project.colStatus} != ?
       ORDER BY 
         CASE WHEN s.${Session.colDate} IS NULL THEN 1 ELSE 0 END,
         s.${Session.colDate} DESC
@@ -139,7 +138,7 @@ class ProjectDao {
 
     try {
 
-      final rows = await db.rawQuery(sql, [ProjectStatus.archived.name]);
+      final rows = await db.rawQuery(sql);
       return rows.map(ProjectWithLastSession.fromMap).toList();
 
     } on DatabaseException catch (e, stack) {
