@@ -30,7 +30,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   Future<void> delete() async {
-    final repository = await ref.watch(repositoryProvider.future);
+    final repository = await ref.read(repositoryProvider.future);
     if (!ref.mounted) return;
 
     await repository.deleteProject(projectId);
@@ -42,7 +42,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   Future<void> archive() async {
-    final repository = await ref.watch(repositoryProvider.future);
+    final repository = await ref.read(repositoryProvider.future);
     final project = await repository.getProjectById(projectId);
     if (!ref.mounted) return;
 
@@ -56,7 +56,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   Future<void> unarchive() async {
-    final repository = await ref.watch(repositoryProvider.future);
+    final repository = await ref.read(repositoryProvider.future);
     final project = await repository.getProjectById(projectId);
     if (!ref.mounted) return;
 
