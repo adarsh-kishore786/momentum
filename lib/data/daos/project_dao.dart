@@ -94,7 +94,7 @@ class ProjectDao {
     try {
       final rows = await db.query(
         Project.table,
-        where: status != null ? 'status = ?' : null,
+        where: status != null ? '${Project.colStatus} = ?' : null,
         whereArgs: status != null ? [status] : null,
         orderBy: 'name ASC'
       );
@@ -104,6 +104,25 @@ class ProjectDao {
     } on DatabaseException catch(e, stack) {
       Error.throwWithStackTrace(
         MomentumDBException('Failed to fetch projects', cause: e),
+        stack
+      );
+    }
+  }
+
+  Future<bool> isProjectActive(int projectId) async {
+    try {
+      final rows = await db.query(
+        Session.table,
+        where: '${Session.colProjectId} = ?',
+        whereArgs: [projectId],
+        limit: 1
+      );
+
+      return rows.isNotEmpty;
+
+    } on DatabaseException catch(e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Failed to fetch sessions', cause: e),
         stack
       );
     }
