@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:momentum/constants.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_detail.dart';
 import 'package:momentum/models/project_status.dart';
@@ -13,6 +15,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   final int projectId;
   int _offset = 0;
   bool _hasMore = true;
+  bool _isLoading = false;
 
   ProjectNotifier(this.projectId);
 
@@ -20,6 +23,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   FutureOr<ProjectDetail> build() async {
     _offset = 0;
     _hasMore = true;
+    _isLoading = false;
 
     final repository = await ref.watch(repositoryProvider.future);
 
@@ -28,7 +32,7 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
       repository.getProjectSessions(projectId, _offset)
     ]);
 
-    _offset = _offset + 10;
+    _offset += Constants.limit;
 
     return ProjectDetail(
       project: results[0] as Project,
@@ -37,12 +41,16 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   FutureOr<List<Session>> _fetch() async {
+    debugPrint("hasMore: $_hasMore");
+    debugPrint("offset: $_offset");
+
     final repository = await ref.read(repositoryProvider.future);
 
     final projectSessions = await repository.getProjectSessions(projectId, _offset);
 
+    debugPrint("projectSessions length: ${projectSessions.length}");
     if (projectSessions.isNotEmpty) {
-      _offset += 10;
+      _offset += Constants.limit;
     } else {
       _hasMore = false;
     }
@@ -50,15 +58,21 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   Future<void> loadMore() async {
-    if (!_hasMore) return;
-    final moreSessions = await _fetch();
+    if (!_hasMore || _isLoading) return;
 
-    state = AsyncData(
-      ProjectDetail(
-        project: state.value!.project,
-        sessions: [...state.value!.sessions, ...moreSessions]
-      )
-    );
+    _isLoading = true;
+    try {
+      final moreSessions = await _fetch();
+
+      state = AsyncData(
+        ProjectDetail(
+          project: state.value!.project,
+          sessions: [...state.value!.sessions, ...moreSessions]
+        )
+      );
+    } finally {
+      _isLoading = false;
+    }
   }
 
   Future<void> delete() async {
@@ -70,7 +84,6 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
 
     ref.invalidate(dashboardProvider);
     ref.invalidate(historyProvider);
-    ref.invalidateSelf();
   }
 
   Future<void> archive() async {

@@ -143,6 +143,18 @@ class _DetailBody extends ConsumerWidget {
           const _EmptySessionsSliver()
         else
           _SessionList(sessions: sessions),
+
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () async {
+                await ref.read(projectProvider(project.id!).notifier).loadMore();
+              },
+              child: const Text('Load More'),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -170,7 +182,7 @@ class _DetailAppBar extends ConsumerWidget {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
-        if (project!.status != ProjectStatus.archived) 
+        if (project != null && project!.status != ProjectStatus.archived) 
           IconButton(
             icon: const Icon(Icons.archive),
             color: cs.onSurface,
@@ -189,7 +201,7 @@ class _DetailAppBar extends ConsumerWidget {
             },
           ),
 
-        if (project!.status == ProjectStatus.archived)
+        if (project != null && project!.status == ProjectStatus.archived)
           IconButton(
             icon: const Icon(Icons.unarchive),
             color: cs.onSurface,

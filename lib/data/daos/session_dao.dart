@@ -1,3 +1,4 @@
+import 'package:momentum/constants.dart';
 import 'package:momentum/data/database_exception.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/session.dart';
@@ -50,7 +51,7 @@ class SessionDao {
         where: '${Session.colProjectId} = ?',
         whereArgs: [projectId],
         orderBy: '${Session.colDate} DESC, ${Session.primaryKey} ASC',
-        limit: 10,
+        limit: Constants.limit,
         offset: offset
       );
       return result.map(Session.fromMap).toList();
