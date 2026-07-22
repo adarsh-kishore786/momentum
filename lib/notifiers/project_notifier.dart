@@ -11,21 +11,53 @@ import 'package:momentum/providers/providers.dart';
 
 class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   final int projectId;
+  int _offset = 0;
+  bool _hasMore = true;
 
   ProjectNotifier(this.projectId);
 
   @override
   FutureOr<ProjectDetail> build() async {
+    _offset = 0;
+    _hasMore = true;
+
     final repository = await ref.watch(repositoryProvider.future);
 
     final results = await Future.wait([
       repository.getProjectById(projectId),
-      repository.getProjectSessions(projectId)
+      repository.getProjectSessions(projectId, _offset)
     ]);
+
+    _offset = _offset + 10;
 
     return ProjectDetail(
       project: results[0] as Project,
       sessions: results[1] as List<Session>
+    );
+  }
+
+  FutureOr<List<Session>> _fetch() async {
+    final repository = await ref.read(repositoryProvider.future);
+
+    final projectSessions = await repository.getProjectSessions(projectId, _offset);
+
+    if (projectSessions.isNotEmpty) {
+      _offset += 10;
+    } else {
+      _hasMore = false;
+    }
+     return projectSessions;
+  }
+
+  Future<void> loadMore() async {
+    if (!_hasMore) return;
+    final moreSessions = await _fetch();
+
+    state = AsyncData(
+      ProjectDetail(
+        project: state.value!.project,
+        sessions: [...state.value!.sessions, ...moreSessions]
+      )
     );
   }
 

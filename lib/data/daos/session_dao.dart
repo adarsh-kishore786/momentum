@@ -43,13 +43,15 @@ class SessionDao {
     }
   }
 
-  Future<List<Session>> getProjectSessions(int projectId) async {
+  Future<List<Session>> getProjectSessions(int projectId, int offset) async {
     try {
       final result = await db.query(
         Session.table,
         where: '${Session.colProjectId} = ?',
         whereArgs: [projectId],
-        orderBy: '${Session.colDate} DESC',
+        orderBy: '${Session.colDate} DESC, ${Session.primaryKey} ASC',
+        limit: 10,
+        offset: offset
       );
       return result.map(Session.fromMap).toList();
 
