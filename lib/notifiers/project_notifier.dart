@@ -61,7 +61,13 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
     if (!ref.mounted) return;
 
     if (project.status == ProjectStatus.archived) {
-      await repository.updateProject(project.copyWith(status: ProjectStatus.active));
+
+      ProjectStatus status = ProjectStatus.active;
+      final val = await repository.isProjectActive(projectId);
+
+      if (val == false) status = ProjectStatus.planned;
+
+      await repository.updateProject(project.copyWith(status: status));
       if (!ref.mounted) return;
     }
 

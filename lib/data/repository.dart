@@ -12,6 +12,7 @@ abstract interface class Repository {
   Future<void> deleteProject(int projectId);
   Future<Project> getProjectById(int projectId);
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession();
+  Future<bool> isProjectActive(int projectId);
 
   Future<Session> insertSession(Session session);
   Future<void> deleteSession(Session session);
@@ -49,6 +50,10 @@ class SqfliteRepository implements Repository {
   @override
   Future<List<ProjectWithLastSession>> getProjectsWithLastSession() =>
     _projectDao.getProjectsWithLastSession();
+
+  @override
+  Future<bool> isProjectActive(int projectId) =>
+    _projectDao.isProjectActive(projectId);
 
   @override
   Future<Session> insertSession(Session session) =>
