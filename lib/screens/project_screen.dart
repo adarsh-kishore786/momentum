@@ -144,17 +144,29 @@ class _DetailBody extends ConsumerWidget {
         else
           _SessionList(sessions: sessions),
 
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: () async {
-                await ref.read(projectProvider(project.id!).notifier).loadMore();
-              },
-              child: const Text('Load More'),
+        if (ref.read(projectProvider(project.id!).notifier).hasMore())
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await ref.read(projectProvider(project.id!).notifier).loadMore();
+                },
+                child: const Text('Load More'),
+              ),
             ),
-          ),
-        )
+          )
+        else
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ElevatedButton(
+                onPressed: null, 
+                onLongPress: null,
+                child: const Text('Reached the end'),
+              ),
+            ),
+          )
       ],
     );
   }

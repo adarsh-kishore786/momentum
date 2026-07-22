@@ -119,6 +119,8 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
     ref.invalidate(dashboardProvider);
     ref.invalidateSelf();
   }
+
+  bool hasMore() => _hasMore;
 }
 
 final projectProvider = AsyncNotifierProvider.family<ProjectNotifier, ProjectDetail, int>
