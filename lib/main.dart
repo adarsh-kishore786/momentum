@@ -6,12 +6,11 @@ import 'package:momentum/routing/router.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  // In main.dart, before runApp()
-ErrorWidget.builder = (FlutterErrorDetails details) {
-  debugPrint('CAUGHT ERROR: ${details.exception}');
-  debugPrint('STACK: ${details.stack}');
-  return ErrorWidget(details.exception); // keep default behavior, just log it
-};
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    debugPrint('CAUGHT ERROR: ${details.exception}');
+    debugPrint('STACK: ${details.stack}');
+    return ErrorWidget(details.exception); // keep default behavior, just log it
+  };
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
