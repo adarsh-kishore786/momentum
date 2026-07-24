@@ -3,4 +3,5 @@ abstract final class Routes {
   static const history   = '/history';
   static const project   = '/projects/:id';
   static const session   = '/sessions/:id';
+  static const more      = '/more';
 }

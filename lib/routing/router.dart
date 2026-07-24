@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/dashboard_screen.dart';
+import 'package:momentum/screens/more_screen.dart';
 import 'package:momentum/screens/project_screen.dart';
 
 class MomentumFooter extends ConsumerWidget {
@@ -12,24 +13,32 @@ class MomentumFooter extends ConsumerWidget {
 
   const MomentumFooter({required this.child, required this.currentPath, super.key});
 
+  int getIndexFromPath() {
+    if (currentPath == Routes.dashboard) return 0;
+    if (currentPath == Routes.more) return 1;
+
+    return -1; // Should never happen
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    int currentIndex = getIndexFromPath();
    
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
-        // currentIndex: isHistory ? 1 : 0,
-        // onTap: (index) {
-        //   if (index == 1 && !isHistory) {
-        //     context.push(Routes.history);
-        //   } else if (index == 0) {
-        //     if (isHistory) {
-        //       context.canPop() ? context.pop() : context.go(Routes.dashboard);
-        //     } else {
-        //       ref.read(projectTabResetProvider.notifier).state++;
-        //     }
-        //   }
-        // },
+        currentIndex: currentIndex,
+        onTap: (index) {
+          if (index == 1 && currentIndex != 1) {
+            context.push(Routes.more);
+          } else if (index == 0) {
+            if (currentIndex != 0) {
+              context.canPop() ? context.pop() : context.go(Routes.dashboard);
+            } else {
+              ref.read(projectTabResetProvider.notifier).state++;
+            }
+          }
+        },
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'Projects'),
           BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More')
@@ -48,6 +57,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(routes: [
             GoRoute(path: Routes.dashboard, builder: (_, _) => DashboardScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.more, builder: (_, _) => MoreScreen()),
           ]),
         ]
       ),
