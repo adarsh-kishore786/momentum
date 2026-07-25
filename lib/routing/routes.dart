@@ -5,4 +5,5 @@ abstract final class Routes {
   static const session   = '/sessions/:id';
   static const more      = '/more';
   static const backup    = '/backup';
+  static const about     = '/about';
 }
