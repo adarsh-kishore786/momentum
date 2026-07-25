@@ -6,4 +6,5 @@ abstract final class Routes {
   static const more      = '/more';
   static const backup    = '/backup';
   static const about     = '/about';
+  static const feedback  = '/feedback';
 }
