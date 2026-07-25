@@ -28,18 +28,33 @@ The philosophy behind these three states is:
 working on it, it goes into the planned state. This is the default state of all
 projects that get created.
 
-![Active list](./lib/gallery/active.jpeg)
+<div align="center">
+  <img src="./lib/gallery/active.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Active projects list</sub>
+</div>
+<br />
 
 2. If there is a project that you are actively working on right now, and want
 to keep track of your activity and investment in it, then it goes into the active
 state.
 
-![Planned list](./lib/gallery/planned.jpeg)
+<div align="center">
+  <img src="./lib/gallery/planned.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Planned projects list</sub>
+</div>
+<br />
 
 3. If there is a project that you feel like putting on the back burner for now,
 then archive it. You can always unarchive it any time.
 
-![Archived list](./lib/gallery/archived.jpeg)
+<div align="center">
+  <img src="./lib/gallery/archived.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Archived projects list</sub>
+</div>
+<br />
 
 ### Sessions
 
@@ -48,5 +63,16 @@ A session is specific to a project. Active projects will show how many days it
 has been since you last logged a session. The log list is maintained, so you
 can always get a record of what all you have worked on on which day.
 
-![Log Session](./lib/gallery/log_session.jpeg)
-![Project with sessions](./lib/gallery/project.jpeg)
+<div align="center">
+  <img src="./lib/gallery/log_session.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Log session</sub>
+</div>
+<br />
+
+<div align="center">
+  <img src="./lib/gallery/project.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Project with sessions</sub>
+</div>
+<br />
