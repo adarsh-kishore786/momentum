@@ -17,7 +17,12 @@ that doesn't fit open-ended technical work.
 Add you projects to track them. Projects can be active, or planned, or archived.
 The philosophy behind these three states is:
 
-![Add Project](./lib/gallery/add_project.jpeg)
+<div align="center">
+  <img src="./lib/gallery/add_project.jpeg" width="200" target="_blank" />
+  <br />
+  <sub>Add a new project</sub>
+</div>
+<br />
 
 1. If there is a project which you have in mind but you haven't actively started
 working on it, it goes into the planned state. This is the default state of all
