@@ -41,14 +41,10 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
   }
 
   FutureOr<List<Session>> _fetch() async {
-    debugPrint("hasMore: $_hasMore");
-    debugPrint("offset: $_offset");
-
     final repository = await ref.read(repositoryProvider.future);
 
     final projectSessions = await repository.getProjectSessions(projectId, _offset);
 
-    debugPrint("projectSessions length: ${projectSessions.length}");
     if (projectSessions.isNotEmpty) {
       _offset += Constants.limit;
     } else {

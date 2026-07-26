@@ -1,3 +1,4 @@
+import 'package:momentum/data/backup_exception.dart';
 import 'package:momentum/data/database_exception.dart';
 import 'package:momentum/models/idea.dart';
 import 'package:momentum/models/project.dart';
@@ -44,4 +45,22 @@ class DatabaseHelper {
     await db.execute(Session.createTableSql);
     await db.execute(Idea.createTableSql);
   }
+
+  Future<String> get databasePath async =>
+      join(await getDatabasesPath(), 'momentum.db');
+
+  /// Flushes WAL into the main file and closes the connection.
+  /// Must be called before any raw file copy of the DB.
+Future<void> closeForFileOp() async {
+  if (_db == null) return;
+  final result = await _db!.rawQuery('PRAGMA wal_checkpoint(TRUNCATE)');
+  final busy = result.first['busy'] as int? ?? 0;
+  if (busy != 0) {
+    throw const BackupIOException(
+      'Could not flush database — try again after closing other operations.',
+    );
+  }
+  await _db!.close();
+  _db = null;
+}
 }
