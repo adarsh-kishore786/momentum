@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:momentum/constants.dart';
 
 class FeedbackScreen extends StatelessWidget {
   const FeedbackScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final email = 'adarsh.kishore786@gmail.com';
-    final repoLink = 'https://github.com/adarsh-kishore786/momentum';
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -41,7 +40,7 @@ class FeedbackScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '1. Email me at $email',
+                  '1. Email me at ${Constants.email}',
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 15,
@@ -49,7 +48,7 @@ class FeedbackScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '2. Raise an issue on the repo: $repoLink',
+                  '2. Raise an issue on the repo: ${Constants.repoLink}',
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 15,

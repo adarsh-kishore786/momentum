@@ -9,6 +9,7 @@ import 'package:momentum/screens/dashboard_screen.dart';
 import 'package:momentum/screens/feedback_screen.dart';
 import 'package:momentum/screens/more_screen.dart';
 import 'package:momentum/screens/project_screen.dart';
+import 'package:momentum/screens/support_screen.dart';
 
 class MomentumFooter extends ConsumerWidget {
   final Widget child;
@@ -84,6 +85,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.feedback,
         builder: (_, _) => FeedbackScreen()
+      ),
+      GoRoute(
+        path: Routes.support,
+        builder: (_, _) => SupportScreen()
       ),
     ]
   );
