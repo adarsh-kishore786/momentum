@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:momentum/data/backup_exception.dart';
 import 'package:momentum/data/database_exception.dart';
 import 'package:momentum/models/idea.dart';
@@ -51,16 +53,38 @@ class DatabaseHelper {
 
   /// Flushes WAL into the main file and closes the connection.
   /// Must be called before any raw file copy of the DB.
-Future<void> closeForFileOp() async {
-  if (_db == null) return;
-  final result = await _db!.rawQuery('PRAGMA wal_checkpoint(TRUNCATE)');
-  final busy = result.first['busy'] as int? ?? 0;
-  if (busy != 0) {
-    throw const BackupIOException(
-      'Could not flush database — try again after closing other operations.',
-    );
+  Future<void> closeForFileOp() async {
+    if (_db == null) return;
+    final result = await _db!.rawQuery('PRAGMA wal_checkpoint(TRUNCATE)');
+    final busy = result.first['busy'] as int? ?? 0;
+    if (busy != 0) {
+      throw const BackupIOException(
+        'Could not flush database — try again after closing other operations.',
+      );
+    }
+    await _db!.close();
+    _db = null;
   }
-  await _db!.close();
-  _db = null;
-}
+
+  Future<void> exportDatabase(Database db, String targetDirectoryPath) async {
+    // 1. Generate a target file path
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final backupPath = '$targetDirectoryPath/backup_$timestamp.db';
+
+    // 2. Ensure target file does NOT exist (VACUUM INTO fails if file exists)
+    final backupFile = File(backupPath);
+    if (await backupFile.exists()) {
+      await backupFile.delete();
+    }
+
+    // 3. Escape single quotes to prevent SQL injection or path errors
+    final escapedPath = backupPath.replaceAll("'", "''");
+
+    try {
+      // 4. Run the vacuum export
+      await db.rawQuery("VACUUM INTO '$escapedPath'");
+    } catch (e) {
+      throw BackupIOException('Failed to export database: $e');
+    }
+  }
 }

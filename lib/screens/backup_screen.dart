@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,22 +22,22 @@ class BackupScreen extends ConsumerWidget {
               trailing: busy ? const CircularProgressIndicator() : null,
               enabled: !busy,
               onTap: () async {
-              final file = await ref.read(backupNotifierProvider.notifier).export();
+              final tempFile = await ref.read(backupNotifierProvider.notifier).export();
               if (!context.mounted) return;
 
-              if (file == null) {
+              if (tempFile == null) {
               _showError(context, ref);
               return;
               }
 
-              final bytes = await file.readAsBytes();
+              final bytes = await tempFile.readAsBytes();
               final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
 
               final savedPath = await FilePicker.platform.saveFile(
                   dialogTitle: 'Save Momentum backup',
                   fileName: 'momentum_backup_$timestamp.mbak',
-                  bytes: bytes, // required on Android/iOS; ignored on desktop
                   type: FileType.custom,
+                  bytes: bytes,
                   allowedExtensions: ['mbak'],
                   );
 
@@ -46,11 +48,26 @@ class BackupScreen extends ConsumerWidget {
                 return;
               }
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Backup saved')),
-                  );
+              try {
+                if (!(Platform.isAndroid || Platform.isIOS)) {
+                  await tempFile.copy(savedPath);
+
+                  if (await tempFile.exists()) await tempFile.delete();
+                  if (!context.mounted) return;
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Backup saved')),
+                    );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('An error occured while saving the backup')),
+                    );
+              }
+
               },
               ),
+
               ListTile(
                   title: const Text('Import from SQLite DB'),
                   subtitle: const Text('This replaces all current data'),
@@ -61,14 +78,14 @@ class BackupScreen extends ConsumerWidget {
 
                   FilePickerResult? result;
                   try {
-                    result = await FilePicker.platform.pickFiles(
+                  result = await FilePicker.platform.pickFiles(
                       type: FileType.any,
-                    );
+                      );
                   } catch (e) {
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Could not open file picker: $e"))
-                    );
+                      );
                   }
 
                   final path = result?.files.single.path;
@@ -76,11 +93,11 @@ class BackupScreen extends ConsumerWidget {
 
                   final ok = await ref.read(backupNotifierProvider.notifier).import(path);
                   if (!ok && context.mounted) {
-                  _showError(context, ref);
+                    _showError(context, ref);
                   } else if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Import successful')),
-                      );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Import successful')),
+                        );
                   }
                   },
                   ),

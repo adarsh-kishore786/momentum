@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 abstract interface class BackupRepository {
-  /// Returns the path to a flushed, consistent copy of the DB ready to share/save.
+  /// Returns the path to a consistent copy of the DB ready to share/save.
   Future<File> prepareExport();
 
   /// Validates [sourcePath], replaces the live DB, reopens it.
@@ -21,21 +21,31 @@ class SqfliteBackupRepository implements BackupRepository {
   @override
   Future<File> prepareExport() async {
     try {
-      await DatabaseHelper.instance.closeForFileOp();
-      final dbPath = await DatabaseHelper.instance.databasePath;
-      final original = File(dbPath);
+      // 1. Get the open Database handle directly without closing it
+      final db = await DatabaseHelper.instance.database;
 
+      // 2. Prepare target export location
       final tempDir = await getTemporaryDirectory();
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final exportFile = File(join(tempDir.path, 'momentum_backup_$timestamp.mbak'));
+      final exportPath = join(tempDir.path, 'momentum_backup_$timestamp.mbak');
 
-      await original.copy(exportFile.path);
+      // 3. Ensure the destination file doesn't already exist
+      final exportFile = File(exportPath);
+      if (await exportFile.exists()) {
+        await exportFile.delete();
+      }
+
+      // 4. Safely escape single quotes in path string
+      final escapedPath = exportPath.replaceAll("'", "''");
+
+      // 5. Run online backup directly from SQLite engine
+      await db.rawQuery("VACUUM INTO '$escapedPath'");
+
       return exportFile;
+    } on DatabaseException catch (e) {
+      throw BackupIOException('Failed to export database: ${e.toString()}');
     } on FileSystemException catch (e) {
-      throw BackupIOException('Could not read database file: ${e.message}');
-    } finally {
-      // reopen so the app keeps working
-      await DatabaseHelper.instance.database;
+      throw BackupIOException('Could not handle backup file: ${e.message}');
     }
   }
 
@@ -57,6 +67,7 @@ class SqfliteBackupRepository implements BackupRepository {
     final rollback = File('$dbPath.rollback');
 
     try {
+      // Import STILL requires closing connection to overwrite disk files
       await DatabaseHelper.instance.closeForFileOp();
 
       if (await currentDb.exists()) {
