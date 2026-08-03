@@ -57,7 +57,7 @@ class _AddSession extends ConsumerState<AddSession> {
       if (mounted) {
         setState(() { 
           _saving = false;
-          _saveError = 'Failed to log session. $e\nTry again.';
+          _saveError = 'Failed to log session. \nTry again.';
         });
       }
     }
