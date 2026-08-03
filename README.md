@@ -18,7 +18,7 @@ Add you projects to track them. Projects can be active, or planned, or archived.
 The philosophy behind these three states is:
 
 <div align="center">
-  <img src="./lib/gallery/add_project.jpeg" width="200" target="_blank" />
+  <img src="./assets/add_project.jpeg" width="200" target="_blank" />
   <br />
   <sub>Add a new project</sub>
 </div>
@@ -29,7 +29,7 @@ working on it, it goes into the planned state. This is the default state of all
 projects that get created.
 
 <div align="center">
-  <img src="./lib/gallery/active.jpeg" width="200" target="_blank" />
+  <img src="./assets/active.jpeg" width="200" target="_blank" />
   <br />
   <sub>Active projects list</sub>
 </div>
@@ -40,7 +40,7 @@ to keep track of your activity and investment in it, then it goes into the activ
 state.
 
 <div align="center">
-  <img src="./lib/gallery/planned.jpeg" width="200" target="_blank" />
+  <img src="./assets/planned.jpeg" width="200" target="_blank" />
   <br />
   <sub>Planned projects list</sub>
 </div>
@@ -50,7 +50,7 @@ state.
 then archive it. You can always unarchive it any time.
 
 <div align="center">
-  <img src="./lib/gallery/archived.jpeg" width="200" target="_blank" />
+  <img src="./assets/archived.jpeg" width="200" target="_blank" />
   <br />
   <sub>Archived projects list</sub>
 </div>
@@ -64,14 +64,14 @@ has been since you last logged a session. The log list is maintained, so you
 can always get a record of what all you have worked on on which day.
 
 <div align="center">
-  <img src="./lib/gallery/log_session.jpeg" width="200" target="_blank" />
+  <img src="./assets/log_session.jpeg" width="200" target="_blank" />
   <br />
   <sub>Log session</sub>
 </div>
 <br />
 
 <div align="center">
-  <img src="./lib/gallery/project.jpeg" width="200" target="_blank" />
+  <img src="./assets/project.jpeg" width="200" target="_blank" />
   <br />
   <sub>Project with sessions</sub>
 </div>
