@@ -24,13 +24,13 @@ class _AddProject extends ConsumerState<AddProject> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<bool> _save() async {
     final name = _nameController.text.trim();
     final desc = _descController.text.trim();
 
     if (name.isEmpty) {
       setState(() => _nameError = 'Name is required');
-      return;
+      return false;
     }
 
     setState(() {
@@ -41,7 +41,9 @@ class _AddProject extends ConsumerState<AddProject> {
 
     try {
       await ref.read(dashboardProvider.notifier).insertProject(name, desc);
+
       if (mounted) Navigator.of(context).pop();
+      return true;
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -49,6 +51,7 @@ class _AddProject extends ConsumerState<AddProject> {
           _saveError = 'Failed to save project. Try again.';
         });
       }
+      return false;
     }
   }
 
@@ -110,7 +113,8 @@ class _AddProject extends ConsumerState<AddProject> {
           SaveButton(
             saveText: 'Save project',
             saving: _saving,
-            save: _save
+            save: _save,
+            successMessage: "Project saved in planned section",
           ),
 
           if (_saveError != null) ...[

@@ -121,12 +121,14 @@ class _MomentumDateSelectorState extends ConsumerState<MomentumDateSelector> {
 class SaveButton extends StatelessWidget {
   final String saveText;
   final bool saving;
-  final Future<void> Function() save;
+  final Future<bool> Function() save;
+  final String successMessage;
 
   const SaveButton({
     required this.saveText,
     required this.saving,
     required this.save,
+    required this.successMessage,
     super.key
   });
 
@@ -137,7 +139,19 @@ class SaveButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: saving ? null : save,
+        onPressed: () async {
+          if (saving) return;
+
+          if (await save()) {
+            if (!context.mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(successMessage)
+              ),
+            );
+          }
+        },
         style: FilledButton.styleFrom(
           backgroundColor: cs.primary,
           foregroundColor: const Color(0xFF0F0F0F),

@@ -244,6 +244,14 @@ class _DetailAppBar extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.of(context).pop();
               }
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("Project deleted"),
+                )
+              );
             }
           },
         ),

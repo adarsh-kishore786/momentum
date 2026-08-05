@@ -31,18 +31,18 @@ class _AddSession extends ConsumerState<AddSession> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<bool> _save() async {
     final int? duration = int.tryParse(_durationController.text.trim());
     final notes = _notesController.text.trim();
 
     if (duration == 0 || duration == null) {
       setState(() => _durationError = 'Duration must be valid');
-      return;
+      return false;
     }
 
     if (notes.isEmpty) {
       setState(() => _notesError = 'Notes cannot be empty');
-      return;
+      return false;
     }
 
     try {
@@ -53,6 +53,8 @@ class _AddSession extends ConsumerState<AddSession> {
         widget.project.id!
       );
       if (mounted) Navigator.of(context).pop();
+      return true;
+
     } catch (e) {
       if (mounted) {
         setState(() { 
@@ -60,6 +62,7 @@ class _AddSession extends ConsumerState<AddSession> {
           _saveError = 'Failed to log session. \nTry again.';
         });
       }
+      return false;
     }
   }
 
@@ -135,6 +138,7 @@ class _AddSession extends ConsumerState<AddSession> {
             saveText: 'Log session',
             saving: _saving,
             save: _save,
+            successMessage: "Session logged!",
           ),
 
           if (_saveError != null) ...[
