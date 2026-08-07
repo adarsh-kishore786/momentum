@@ -194,6 +194,12 @@ class _DetailAppBar extends ConsumerWidget {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          color: cs.primary,
+          onPressed: () {},
+        ),
+
         if (project != null && project!.status != ProjectStatus.archived) 
           IconButton(
             icon: const Icon(Icons.archive),
@@ -391,15 +397,36 @@ class _SessionTile extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 5),
-          Text(
-            session.note,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurfaceVariant,
-              height: 1.45,
-            ),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                session.note,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: cs.onSurfaceVariant,
+                  height: 1.45,
+                ),
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    color: cs.onSurface,
+                    onPressed: () {},
+                  ),
+
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    color: cs.error,
+                    onPressed: () async { },
+                  ),
+                ],
+              )
+            ],
+          )
         ],
       ),
     );
