@@ -58,6 +58,17 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
     ref.invalidate(projectProvider);
     ref.invalidateSelf();
   }
+
+  Future<void> updateSession(Session session) async {
+    final repository = await ref.read(repositoryProvider.future);
+    if (!ref.mounted) return;
+
+    await repository.updateSession(session);
+    if (!ref.mounted) return;
+
+    ref.invalidate(projectProvider);
+    ref.invalidateSelf();
+  }
 }
 
 final dashboardProvider = 

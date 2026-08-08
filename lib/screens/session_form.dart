@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
+import 'package:momentum/models/session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/screens/commons.dart';
 
-class AddSession extends ConsumerStatefulWidget {
+class SessionForm extends ConsumerStatefulWidget {
   final Project project;
+  final Session? session; // null = log new, non-null = edit existing
 
-  const AddSession({required this.project, super.key});
+  const SessionForm({required this.project, this.session, super.key});
 
   @override
-  ConsumerState<AddSession> createState() => 
-    _AddSession();
+  ConsumerState<SessionForm> createState() => _SessionFormState();
 }
 
-class _AddSession extends ConsumerState<AddSession> {
-  final _durationController = TextEditingController();
-  final _notesController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+class _SessionFormState extends ConsumerState<SessionForm> {
+  late final TextEditingController _durationController;
+  late final TextEditingController _notesController;
+  late DateTime _selectedDate;
 
   bool _saving = false;
   String? _durationError;
   String? _notesError;
   String? _saveError;
+
+  bool get _isEditing => widget.session != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _durationController = TextEditingController(
+      text: widget.session != null ? widget.session!.durationMinutes.toString() : '',
+    );
+    _notesController = TextEditingController(text: widget.session?.note ?? '');
+    _selectedDate = widget.session?.date ?? DateTime.now();
+  }
 
   @override
   void dispose() {
@@ -35,31 +48,49 @@ class _AddSession extends ConsumerState<AddSession> {
     final int? duration = int.tryParse(_durationController.text.trim());
     final notes = _notesController.text.trim();
 
-    if (duration == 0 || duration == null) {
+    if (duration == null || duration <= 0) {
       setState(() => _durationError = 'Duration must be valid');
       return false;
     }
-
     if (notes.isEmpty) {
       setState(() => _notesError = 'Notes cannot be empty');
       return false;
     }
 
+    setState(() {
+      _saving = true;
+      _durationError = null;
+      _notesError = null;
+      _saveError = null;
+    });
+
     try {
-      await ref.read(dashboardProvider.notifier).logSession(
-        duration,
-        notes,
-        _selectedDate.toUtc(),
-        widget.project.id!
-      );
+      final notifier = ref.read(dashboardProvider.notifier);
+      if (_isEditing) {
+        await notifier.updateSession(
+          widget.session!.copyWith(
+            durationMinutes: duration,
+            note: notes,
+            date: _selectedDate.toUtc(),
+          ),
+        );
+      } else {
+        await notifier.logSession(
+          duration,
+          notes,
+          _selectedDate.toUtc(),
+          widget.project.id!,
+        );
+      }
       if (mounted) Navigator.of(context).pop();
       return true;
-
     } catch (e) {
       if (mounted) {
-        setState(() { 
+        setState(() {
           _saving = false;
-          _saveError = 'Failed to log session. \nTry again.';
+          _saveError = _isEditing
+              ? 'Failed to update session.\nTry again.'
+              : 'Failed to log session.\nTry again.';
         });
       }
       return false;
@@ -75,10 +106,7 @@ class _AddSession extends ConsumerState<AddSession> {
         color: cs.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: EdgeInsets.fromLTRB(
-        24, 24, 24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,61 +120,41 @@ class _AddSession extends ConsumerState<AddSession> {
                 color: cs.onSurfaceVariant.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
-            )
-          ),
-
-          Text(
-            'Log session for ${widget.project.name}',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface
             ),
           ),
-
+          Text(
+            _isEditing ? 'Edit session for ${widget.project.name}' : 'Log session for ${widget.project.name}',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: cs.onSurface),
+          ),
           const SizedBox(height: 20),
-
           MomentumField(
             controller: _durationController,
             label: 'Duration (min)',
             autofocus: true,
-            keyBoardType: TextInputType.numberWithOptions(decimal: false, signed: false),
+            keyBoardType: const TextInputType.numberWithOptions(decimal: false, signed: false),
             errorText: _durationError,
           ),
-
           const SizedBox(height: 20),
-
           MomentumField(
             controller: _notesController,
             label: 'Notes',
             maxLines: 2,
             errorText: _notesError,
           ),
-
           MomentumDateSelector(
             initialDate: _selectedDate,
-            onDateSelected: (newDate) {
-              setState(() {
-                _selectedDate = newDate;
-              });
-            },
+            onDateSelected: (newDate) => setState(() => _selectedDate = newDate),
           ),
-
           const SizedBox(height: 24),
-
           SaveButton(
-            saveText: 'Log session',
+            saveText: _isEditing ? 'Save changes' : 'Log session',
             saving: _saving,
             save: _save,
-            successMessage: "Session logged!",
+            successMessage: _isEditing ? 'Session updated' : 'Session logged!',
           ),
-
           if (_saveError != null) ...[
             const SizedBox(height: 12),
-            Text(
-              _saveError!,
-              style: TextStyle(fontSize: 13, color: cs.error),
-            ),
+            Text(_saveError!, style: TextStyle(fontSize: 13, color: cs.error)),
           ],
         ],
       ),

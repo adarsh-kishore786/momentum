@@ -6,8 +6,8 @@ import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/notifiers/session_notifier.dart';
-import 'package:momentum/screens/add_session.dart';
 import 'package:momentum/screens/commons.dart';
+import 'package:momentum/screens/session_form.dart';
 import 'package:momentum/screens/project_form.dart';
 
 class ProjectScreen extends ConsumerWidget {
@@ -32,7 +32,7 @@ class ProjectScreen extends ConsumerWidget {
             onPressed: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-              builder: (_) => AddSession(project: data.project),
+              builder: (_) => SessionForm(project: data.project),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: Icon(Icons.add),
@@ -144,7 +144,7 @@ class _DetailBody extends ConsumerWidget {
         if (sessions.isEmpty)
           const _EmptySessionsSliver()
         else
-          _SessionList(sessions: sessions),
+          _SessionList(project: project, sessions: sessions),
 
         if (ref.read(projectProvider(project.id!).notifier).hasMore())
           SliverToBoxAdapter(
@@ -326,8 +326,9 @@ class _EmptySessionsSliver extends StatelessWidget {
 // ── Session list ──────────────────────────────────────────────────────────────
 
 class _SessionList extends StatelessWidget {
-  const _SessionList({required this.sessions});
+  const _SessionList({required this.project, required this.sessions});
 
+  final Project project;
   final List<Session> sessions;
 
   @override
@@ -340,14 +341,15 @@ class _SessionList extends StatelessWidget {
         endIndent: 24,
         color: const Color(0xFF1E1E1E),
       ),
-      itemBuilder: (context, i) => _SessionTile(session: sessions[i]),
+      itemBuilder: (context, i) => _SessionTile(project: project, session: sessions[i]),
     );
   }
 }
 
 class _SessionTile extends ConsumerWidget {
-  const _SessionTile({required this.session});
+  const _SessionTile({required this.project, required this.session});
 
+  final Project project;
   final Session session;
 
   static final _dateFmt = DateFormat('EEE, d MMM');
@@ -421,7 +423,11 @@ class _SessionTile extends ConsumerWidget {
                   IconButton(
                     icon: const Icon(Icons.edit),
                     color: cs.onSurface,
-                    onPressed: () {},
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => SessionForm(project: project, session: session)
+                    ),
                   ),
 
                   IconButton(

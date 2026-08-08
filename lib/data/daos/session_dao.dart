@@ -44,6 +44,30 @@ class SessionDao {
     }
   }
 
+  Future<void> update(Session session) async {
+    if (session.id == null) {
+      throw ArgumentError('Cannot update a project without an ID');
+    }
+
+    try {
+      final count = await db.update(
+        Session.table,
+        session.toMap(),
+        where: '${Session.primaryKey} = ?',
+        whereArgs: [session.id]
+      );
+
+      if (count == 0) {
+        throw MomentumDBException('Session not found: ${session.id}');
+      }
+    } on DatabaseException catch (e, stack) {
+      Error.throwWithStackTrace(
+        MomentumDBException('Failed to update session', cause: e),
+        stack
+      );
+    }
+  }
+
   Future<List<Session>> getProjectSessions(int projectId, int offset) async {
     try {
       final result = await db.query(
