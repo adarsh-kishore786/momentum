@@ -173,7 +173,7 @@ class SaveButton extends StatelessWidget {
   }
 }
 
-Future<bool?> confirmDelete(BuildContext context) {
+Future<bool?> confirmDelete(BuildContext context, {String item = 'project'}) {
   final cs = Theme.of(context).colorScheme;
 
   return showDialog<bool>(
@@ -181,7 +181,7 @@ Future<bool?> confirmDelete(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this project?'),
+        content: Text('Are you sure you want to delete this $item?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false), // Returns false

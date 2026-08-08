@@ -7,7 +7,6 @@ import 'package:momentum/models/project_detail.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
-import 'package:momentum/notifiers/history_notifier.dart';
 import 'package:momentum/providers/providers.dart';
 
 class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
@@ -78,7 +77,6 @@ class ProjectNotifier extends AsyncNotifier<ProjectDetail> {
     if (!ref.mounted) return;
 
     ref.invalidate(dashboardProvider);
-    ref.invalidate(historyProvider);
   }
 
   Future<void> archive() async {

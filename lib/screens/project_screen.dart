@@ -5,6 +5,7 @@ import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
+import 'package:momentum/notifiers/session_notifier.dart';
 import 'package:momentum/screens/add_session.dart';
 import 'package:momentum/screens/commons.dart';
 
@@ -339,7 +340,7 @@ class _SessionList extends StatelessWidget {
   }
 }
 
-class _SessionTile extends StatelessWidget {
+class _SessionTile extends ConsumerWidget {
   const _SessionTile({required this.session});
 
   final Session session;
@@ -367,7 +368,7 @@ class _SessionTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
@@ -421,7 +422,21 @@ class _SessionTile extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.delete),
                     color: cs.error,
-                    onPressed: () async { },
+                    onPressed: () async {
+                      bool? confirm = await confirmDelete(context, item: 'session');
+
+                      if (confirm == true) {
+                        await ref.read(sessionProvider(session.id!).notifier).delete();
+                        
+                        if (!context.mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text("Session deleted"),
+                          )
+                        );
+                      }
+                    },
                   ),
                 ],
               )

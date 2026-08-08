@@ -29,12 +29,12 @@ class SessionDao {
     }
   }
 
-  Future<void> delete(Session session) async {
+  Future<void> delete(int sessionId) async {
     try {
       await db.delete(
         Session.table,
         where: '${Session.primaryKey} = ?',
-        whereArgs: [session.id]
+        whereArgs: [sessionId]
       );
     } on DatabaseException catch (e, stack) {
       Error.throwWithStackTrace(
@@ -58,7 +58,7 @@ class SessionDao {
 
     } on DatabaseException catch (e, stack) {
       Error.throwWithStackTrace(
-        MomentumDBException('Failed to delete sessions', cause: e),
+        MomentumDBException('Failed to get sessions', cause: e),
         stack
       );
     }

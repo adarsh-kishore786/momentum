@@ -15,7 +15,7 @@ abstract interface class Repository {
   Future<bool> isProjectActive(int projectId);
 
   Future<Session> insertSession(Session session);
-  Future<void> deleteSession(Session session);
+  Future<void> deleteSession(int sessionId);
   Future<List<Session>> getProjectSessions(int projectId, int offset);
   Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit});
 }
@@ -60,8 +60,8 @@ class SqfliteRepository implements Repository {
     _sessionDao.insert(session);
 
   @override
-  Future<void> deleteSession(Session session) =>
-    _sessionDao.delete(session);
+  Future<void> deleteSession(int sessionId) =>
+    _sessionDao.delete(sessionId);
 
   @override
   Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit}) {
