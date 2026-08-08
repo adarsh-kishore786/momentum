@@ -8,6 +8,7 @@ import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/notifiers/session_notifier.dart';
 import 'package:momentum/screens/add_session.dart';
 import 'package:momentum/screens/commons.dart';
+import 'package:momentum/screens/project_form.dart';
 
 class ProjectScreen extends ConsumerWidget {
   const ProjectScreen({
@@ -198,7 +199,11 @@ class _DetailAppBar extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.edit),
           color: cs.primary,
-          onPressed: () {},
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => ProjectForm(project: project)
+          ),
         ),
 
         if (project != null && project!.status != ProjectStatus.archived) 

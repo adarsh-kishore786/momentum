@@ -34,7 +34,6 @@ class SqfliteRepository implements Repository {
   Future<Project> insertProject(Project project) =>
     _projectDao.insert(project);
  
-
   @override
   Future<void> updateProject(Project project) =>
     _projectDao.update(project);

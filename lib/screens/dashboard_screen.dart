@@ -6,7 +6,7 @@ import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
-import 'package:momentum/screens/add_project.dart';
+import 'package:momentum/screens/project_form.dart';
 import 'package:momentum/screens/add_session.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -123,7 +123,7 @@ class _Dashboard extends StatelessWidget {
           onPressed: () => showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (_) => const AddProject(),
+            builder: (_) => const ProjectForm(),
           ),
           backgroundColor: colorScheme.primary,
           child: Icon(Icons.add),

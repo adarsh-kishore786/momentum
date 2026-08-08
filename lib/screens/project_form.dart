@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:momentum/models/project.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/screens/commons.dart';
 
-class AddProject extends ConsumerStatefulWidget {
-  const AddProject({super.key});
+class ProjectForm extends ConsumerStatefulWidget {
+  final Project? project; // null = create, non-null = edit
+
+  const ProjectForm({super.key, this.project});
 
   @override
-  ConsumerState<AddProject> createState() => _AddProject();
+  ConsumerState<ProjectForm> createState() => _ProjectFormState();
 }
 
-class _AddProject extends ConsumerState<AddProject> {
-  final _nameController = TextEditingController();
-  final _descController = TextEditingController();
+class _ProjectFormState extends ConsumerState<ProjectForm> {
+  late final _nameController = TextEditingController(text: widget.project?.name ?? '');
+  late final _descController = TextEditingController(text: widget.project?.description ?? '');
   bool _saving = false;
   String? _nameError;
   String? _saveError;
+
+  bool get _isEditing => widget.project != null;
 
   @override
   void dispose() {
@@ -40,7 +45,14 @@ class _AddProject extends ConsumerState<AddProject> {
     });
 
     try {
-      await ref.read(dashboardProvider.notifier).insertProject(name, desc);
+      final notifier = ref.read(dashboardProvider.notifier);
+      if (_isEditing) {
+        await notifier.updateProject(
+          widget.project!.copyWith(name: name, description: desc),
+        );
+      } else {
+        await notifier.insertProject(name, desc);
+      }
 
       if (mounted) Navigator.of(context).pop();
       return true;
@@ -48,7 +60,9 @@ class _AddProject extends ConsumerState<AddProject> {
       if (mounted) {
         setState(() {
           _saving = false;
-          _saveError = 'Failed to save project. Try again.';
+          _saveError = _isEditing
+              ? 'Failed to update project. Try again.'
+              : 'Failed to save project. Try again.';
         });
       }
       return false;
@@ -64,15 +78,11 @@ class _AddProject extends ConsumerState<AddProject> {
         color: cs.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: EdgeInsets.fromLTRB(
-        24, 24, 24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // drag handle
           Center(
             child: Container(
               width: 40,
@@ -84,45 +94,33 @@ class _AddProject extends ConsumerState<AddProject> {
               ),
             ),
           ),
-
           Text(
-            'New project',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface,
-            ),
+            _isEditing ? 'Edit project' : 'New project',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: cs.onSurface),
           ),
           const SizedBox(height: 20),
-
           MomentumField(
             controller: _nameController,
             label: 'Name',
             autofocus: true,
-            errorText: _nameError,
+            errorText: _nameError
           ),
           const SizedBox(height: 12),
           MomentumField(
             controller: _descController,
             label: 'Description',
-            maxLines: 3,
+            maxLines: 3
           ),
-
           const SizedBox(height: 24),
-
           SaveButton(
-            saveText: 'Save project',
+            saveText: _isEditing ? 'Save changes' : 'Save project',
             saving: _saving,
             save: _save,
-            successMessage: "Project saved in planned section",
+            successMessage: _isEditing ? 'Project updated' : 'Project saved',
           ),
-
           if (_saveError != null) ...[
             const SizedBox(height: 12),
-            Text(
-              _saveError!,
-              style: TextStyle(fontSize: 13, color: cs.error),
-            ),
+            Text(_saveError!, style: TextStyle(fontSize: 13, color: cs.error)),
           ],
         ],
       ),
