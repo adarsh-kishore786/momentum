@@ -408,12 +408,14 @@ class _SessionTile extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                session.note,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: cs.onSurfaceVariant,
-                  height: 1.45,
+              Expanded(
+                child: Text(
+                  session.note,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: cs.onSurfaceVariant,
+                    height: 1.45,
+                  ),
                 ),
               ),
 
