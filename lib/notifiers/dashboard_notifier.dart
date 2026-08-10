@@ -17,12 +17,13 @@ class DashboardNotifier extends AsyncNotifier<List<ProjectWithLastSession>> {
 
   void refresh() => ref.invalidateSelf();
 
-  Future<void> insertProject(String name, String description) async {
+  Future<int> insertProject(String name, String description) async {
     final project = Project(name: name, description: description);
     final repository = await ref.read(repositoryProvider.future);
-    await repository.insertProject(project);
+    int projectId = await repository.insertProject(project);
 
     ref.invalidateSelf();
+    return projectId;
   }
   
   Future<void> updateProject(Project newProject) async {

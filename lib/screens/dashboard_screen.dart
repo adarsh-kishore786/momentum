@@ -89,10 +89,8 @@ class _Dashboard extends StatelessWidget {
         tabController.animateTo(0);
       },
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         appBar: AppBar(
           toolbarHeight: 0,
-          backgroundColor: Colors.transparent,
           bottom: TabBar(
             labelColor: colorScheme.primary,
             unselectedLabelColor: colorScheme.secondary,

@@ -10,7 +10,7 @@ class ProjectDao {
 
   ProjectDao({required this.db});
 
-  Future<Project> insert(Project project) async {
+  Future<int> insert(Project project) async {
     try {
       final id = await db.insert(
         Project.table,
@@ -18,7 +18,7 @@ class ProjectDao {
         conflictAlgorithm: ConflictAlgorithm.abort
       );
 
-      return project.copyWith(id: id);
+      return id;
 
     } on DatabaseException catch (e, stack) {
       Error.throwWithStackTrace(

@@ -27,6 +27,7 @@ class MomentumApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Momentum',
+      routerConfig: router,
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF141414),
         colorScheme: const ColorScheme.dark(
@@ -39,8 +40,7 @@ class MomentumApp extends ConsumerWidget {
           tertiary: Colors.purple,
           error: Colors.red,
         ),
-      ),
-      routerConfig: router,
+      )
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/commons.dart';
 
 class ProjectForm extends ConsumerStatefulWidget {
@@ -45,16 +47,25 @@ class _ProjectFormState extends ConsumerState<ProjectForm> {
     });
 
     try {
+      final int projectId;
       final notifier = ref.read(dashboardProvider.notifier);
       if (_isEditing) {
+        projectId = widget.project!.id!;
         await notifier.updateProject(
           widget.project!.copyWith(name: name, description: desc),
         );
       } else {
-        await notifier.insertProject(name, desc);
+        projectId = await notifier.insertProject(name, desc);
       }
 
       if (mounted) Navigator.of(context).pop();
+
+      if (!mounted) return false;
+
+      if (!_isEditing) {
+        context.push(Routes.project.replaceAll(':id', projectId.toString()));
+      }
+
       return true;
     } catch (e) {
       if (mounted) {
@@ -116,7 +127,7 @@ class _ProjectFormState extends ConsumerState<ProjectForm> {
             saveText: _isEditing ? 'Save changes' : 'Save project',
             saving: _saving,
             save: _save,
-            successMessage: _isEditing ? 'Project updated' : 'Project saved',
+            successMessage: _isEditing ? 'Project updated' : 'Project saved in Planned tab',
           ),
           if (_saveError != null) ...[
             const SizedBox(height: 12),
