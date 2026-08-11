@@ -1,5 +1,7 @@
+import 'package:momentum/data/daos/idea_dao.dart';
 import 'package:momentum/data/daos/project_dao.dart';
 import 'package:momentum/data/daos/session_dao.dart';
+import 'package:momentum/models/idea.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/models/session.dart';
@@ -19,17 +21,25 @@ abstract interface class Repository {
   Future<void> updateSession(Session session);
   Future<List<Session>> getProjectSessions(int projectId, int offset);
   Future<List<SessionWithProjectName>> getAllSessions({SessionCursor? after, int? limit});
+
+  Future<int> insertIdea(Idea idea);
+  Future<void> updateIdea(Idea idea);
+  Future<void> deleteIdea(int ideaId);
+  Future<List<Idea>> getIdeas(int projectId);
 }
 
 class SqfliteRepository implements Repository {
   final ProjectDao _projectDao;
   final SessionDao _sessionDao;
+  final IdeaDao _ideaDao;
 
   SqfliteRepository({
     required ProjectDao projectDao,
-    required SessionDao sessionDao
+    required SessionDao sessionDao,
+    required IdeaDao ideaDao,
   }) : _projectDao = projectDao,
-       _sessionDao = sessionDao;
+       _sessionDao = sessionDao,
+       _ideaDao = ideaDao;
 
   @override
   Future<int> insertProject(Project project) =>
@@ -78,4 +88,20 @@ class SqfliteRepository implements Repository {
   @override
   Future<List<Session>> getProjectSessions(int projectId, int offset) =>
     _sessionDao.getProjectSessions(projectId, offset);
+
+  @override
+  Future<int> insertIdea(Idea idea) =>
+    _ideaDao.insert(idea);
+
+  @override
+  Future<void> updateIdea(Idea idea) =>
+    _ideaDao.update(idea);
+
+  @override
+  Future<void> deleteIdea(int ideaId) =>
+    _ideaDao.delete(ideaId);
+    
+  @override
+  Future<List<Idea>> getIdeas(int projectId) =>
+    _ideaDao.getIdeas(projectId);
 }

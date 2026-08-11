@@ -96,7 +96,7 @@ class ProjectDao {
         Project.table,
         where: status != null ? '${Project.colStatus} = ?' : null,
         whereArgs: status != null ? [status] : null,
-        orderBy: 'name ASC'
+        orderBy: '${Project.colName} ASC'
       );
 
       return rows.map(Project.fromMap).toList();
