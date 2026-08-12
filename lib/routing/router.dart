@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
+import 'package:momentum/notifiers/tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/about_screen.dart';
 import 'package:momentum/screens/backup_screen.dart';
@@ -39,7 +39,7 @@ class MomentumFooter extends ConsumerWidget {
             if (currentIndex != 0) {
               context.canPop() ? context.pop() : context.go(Routes.dashboard);
             } else {
-              ref.read(projectTabResetProvider.notifier).state++;
+              ref.read(dashboardTabResetProvider.notifier).state++;
             }
           }
         },

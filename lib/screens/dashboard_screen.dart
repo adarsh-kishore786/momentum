@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
-import 'package:momentum/notifiers/project_tab_reset_notifier.dart';
+import 'package:momentum/notifiers/tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/project_form.dart';
 import 'package:momentum/screens/session_form.dart';
@@ -40,7 +40,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
 
-    ref.listen<int>(projectTabResetProvider, (prev, next) {
+    ref.listen<int>(dashboardTabResetProvider, (prev, next) {
       _tabController.animateTo(0);
     });
 
