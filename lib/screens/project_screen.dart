@@ -6,28 +6,57 @@ import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/notifiers/session_notifier.dart';
+import 'package:momentum/notifiers/tab_reset_notifier.dart';
 import 'package:momentum/screens/commons.dart';
 import 'package:momentum/screens/session_form.dart';
 import 'package:momentum/screens/project_form.dart';
 
-class ProjectScreen extends ConsumerWidget {
+class ProjectScreen extends ConsumerStatefulWidget {
+  final int projectId;
+
   const ProjectScreen({
     super.key,
     required this.projectId,
   });
 
-  final int projectId;
+  @override
+  ConsumerState<ProjectScreen> createState() => _ProjectScreenState();
+}
+
+class _ProjectScreenState extends ConsumerState<ProjectScreen> with SingleTickerProviderStateMixin {
+
+  late final TabController _tabController;
+  late final projectId = widget.projectId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(projectProvider(projectId));
+
+    ref.listen<int>(projectTabResetProvider, (prev, next) {
+      _tabController.animateTo(0);
+    });
 
     return Scaffold(
       body: state.when(
         loading: () => const _LoadingBody(),
         error: (e, _) => _ErrorBody(error: e),
         data: (data) => Scaffold(
-          body: _DetailBody(project: data.project, sessions: data.sessions),
+          body: _DetailBody(project: data.project, sessions: data.sessions, tabController: _tabController),
           floatingActionButton: FloatingActionButton(
             onPressed: () => showModalBottomSheet(
               context: context,
@@ -50,7 +79,7 @@ class _LoadingBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CustomScrollView(
       slivers: [
-        _DetailAppBar(project: null, sessions: []),
+        _DetailAppBar(project: null),
         SliverFillRemaining(
           child: Center(child: CircularProgressIndicator()),
         ),
@@ -58,8 +87,6 @@ class _LoadingBody extends StatelessWidget {
     );
   }
 }
-
-// ── Error ─────────────────────────────────────────────────────────────────────
 
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({required this.error});
@@ -71,13 +98,13 @@ class _ErrorBody extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return CustomScrollView(
       slivers: [
-        const _DetailAppBar(project: null, sessions: []),
+        const _DetailAppBar(project: null),
         SliverFillRemaining(
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
               child: Text(
-                'Failed to load sessions.\n$error',
+                'Failed to load project details. Try again.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: cs.error, fontSize: 13),
               ),
@@ -89,13 +116,17 @@ class _ErrorBody extends StatelessWidget {
   }
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
-
 class _DetailBody extends ConsumerWidget {
-  const _DetailBody({required this.project, required this.sessions});
+  const _DetailBody({
+    required this.project,
+    required this.sessions,
+    required this.tabController
+  });
 
   final Project project;
   final List<Session> sessions;
+
+  final TabController tabController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,7 +134,7 @@ class _DetailBody extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        _DetailAppBar(project: project, sessions: sessions),
+        _DetailAppBar(project: project),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
@@ -140,6 +171,24 @@ class _DetailBody extends ConsumerWidget {
             ),
           ),
         ),
+        SliverToBoxAdapter(
+          child: TabBar(
+            labelColor: cs.primary,
+            unselectedLabelColor: cs.secondary,
+            controller: tabController,
+            dividerColor: cs.tertiary,
+            tabs: [
+              Tab(text: 'Sessions'),
+              Tab(text: 'Ideas')
+            ]
+          ),
+        ),
+        // TabBarView(
+        //   controller: tabController,
+        //   children: [
+        //     Scaffold()
+        //   ],
+        // ),
         _SessionsHeader(count: sessions.length),
         if (sessions.isEmpty)
           const _EmptySessionsSliver()
@@ -174,13 +223,10 @@ class _DetailBody extends ConsumerWidget {
   }
 }
 
-// ── App bar ───────────────────────────────────────────────────────────────────
-
 class _DetailAppBar extends ConsumerWidget {
-  const _DetailAppBar({required this.project, required this.sessions});
+  const _DetailAppBar({required this.project});
 
   final Project? project;
-  final List<Session> sessions;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
