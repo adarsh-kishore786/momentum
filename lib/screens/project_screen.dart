@@ -23,18 +23,20 @@ class ProjectScreen extends ConsumerStatefulWidget {
   ConsumerState<ProjectScreen> createState() => _ProjectScreenState();
 }
 
-class _ProjectScreenState extends ConsumerState<ProjectScreen> with SingleTickerProviderStateMixin {
-
+class _ProjectScreenState extends ConsumerState<ProjectScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  late final projectId = widget.projectId;
+  int _tabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) setState(() {});
-    });
+    _tabController = TabController(length: 2, vsync: this)
+      ..addListener(() {
+        if (!_tabController.indexIsChanging) {
+          setState(() => _tabIndex = _tabController.index);
+        }
+      });
   }
 
   @override
@@ -45,7 +47,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(projectProvider(projectId));
+    final state = ref.watch(projectProvider(widget.projectId));
 
     ref.listen<int>(projectTabResetProvider, (prev, next) {
       _tabController.animateTo(0);
@@ -55,22 +57,31 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> with SingleTicker
       body: state.when(
         loading: () => const _LoadingBody(),
         error: (e, _) => _ErrorBody(error: e),
-        data: (data) => Scaffold(
-          body: _DetailBody(project: data.project, sessions: data.sessions, tabController: _tabController),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => SessionForm(project: data.project),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Icon(Icons.add),
-          ),
-        )
+        data: (data) => _DetailBody(
+          project: data.project,
+          sessions: data.sessions,
+          tabController: _tabController,
+        ),
+      ),
+      floatingActionButton: state.maybeWhen(
+        data: (data) => _tabIndex == 0
+            ? FloatingActionButton(
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => SessionForm(project: data.project),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: const Icon(Icons.add),
+              )
+            : null,
+        orElse: () => null,
       ),
     );
   }
 }
+
+// ── Loading / error states ──────────────────────────────────────────────────
 
 class _LoadingBody extends StatelessWidget {
   const _LoadingBody();
@@ -116,111 +127,122 @@ class _ErrorBody extends StatelessWidget {
   }
 }
 
-class _DetailBody extends ConsumerWidget {
+// ── Detail body: header + tabs ──────────────────────────────────────────────
+
+class _DetailBody extends StatelessWidget {
   const _DetailBody({
     required this.project,
     required this.sessions,
-    required this.tabController
+    required this.tabController,
   });
 
   final Project project;
   final List<Session> sessions;
-
   final TabController tabController;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return CustomScrollView(
-      slivers: [
+    return NestedScrollView(
+      headerSliverBuilder: (context, _) => [
         _DetailAppBar(project: project),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    text: project.name,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: cs.onSurface,
-                      letterSpacing: -0.02,
-                    ),
-                    children: <InlineSpan>[
-                      if (project.status == ProjectStatus.archived)
-                        TextSpan(
-                          text: " (archived)",
-                          style: TextStyle(color: cs.error, fontSize: 18)
-                        )
-
-                    ]
-                  ),
-                ),
-                if (project.description.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    project.description,
-                    style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
-                  ),
-                ],
+        SliverToBoxAdapter(child: _ProjectHeader(project: project)),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _TabBarDelegate(
+            TabBar(
+              controller: tabController,
+              labelColor: cs.primary,
+              unselectedLabelColor: cs.secondary,
+              dividerColor: cs.tertiary,
+              tabs: const [
+                Tab(text: 'Sessions'),
+                Tab(text: 'Ideas'),
               ],
             ),
           ),
         ),
-        SliverToBoxAdapter(
-          child: TabBar(
-            labelColor: cs.primary,
-            unselectedLabelColor: cs.secondary,
-            controller: tabController,
-            dividerColor: cs.tertiary,
-            tabs: [
-              Tab(text: 'Sessions'),
-              Tab(text: 'Ideas')
-            ]
-          ),
-        ),
-        // TabBarView(
-        //   controller: tabController,
-        //   children: [
-        //     Scaffold()
-        //   ],
-        // ),
-        _SessionsHeader(count: sessions.length),
-        if (sessions.isEmpty)
-          const _EmptySessionsSliver()
-        else
-          _SessionList(project: project, sessions: sessions),
-
-        if (ref.read(projectProvider(project.id!).notifier).hasMore())
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                onPressed: () async {
-                  await ref.read(projectProvider(project.id!).notifier).loadMore();
-                },
-                child: const Text('Load More'),
-              ),
-            ),
-          )
-        else
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                onPressed: null, 
-                onLongPress: null,
-                child: const Text('Reached the end'),
-              ),
-            ),
-          )
       ],
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          _SessionsTab(project: project, sessions: sessions),
+          _IdeasTab(project: project),
+        ],
+      ),
     );
   }
+}
+
+class _ProjectHeader extends StatelessWidget {
+  const _ProjectHeader({required this.project});
+
+  final Project project;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text.rich(
+            TextSpan(
+              text: project.name,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+                letterSpacing: -0.02,
+              ),
+              children: <InlineSpan>[
+                if (project.status == ProjectStatus.archived)
+                  TextSpan(
+                    text: ' (archived)',
+                    style: TextStyle(color: cs.error, fontSize: 18),
+                  ),
+              ],
+            ),
+          ),
+          if (project.description.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              project.description,
+              style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Pins the TabBar under the header inside the NestedScrollView.
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  _TabBarDelegate(this.tabBar);
+
+  final TabBar tabBar;
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _TabBarDelegate oldDelegate) =>
+      tabBar != oldDelegate.tabBar;
 }
 
 class _DetailAppBar extends ConsumerWidget {
@@ -248,11 +270,10 @@ class _DetailAppBar extends ConsumerWidget {
           onPressed: () => showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (_) => ProjectForm(project: project)
+            builder: (_) => ProjectForm(project: project),
           ),
         ),
-
-        if (project != null && project!.status != ProjectStatus.archived) 
+        if (project != null && project!.status != ProjectStatus.archived)
           IconButton(
             icon: const Icon(Icons.archive),
             color: cs.onSurface,
@@ -261,16 +282,12 @@ class _DetailAppBar extends ConsumerWidget {
 
               if (!context.mounted) return;
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Project archived.")
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Project archived.')));
 
               Navigator.of(context).pop();
             },
           ),
-
         if (project != null && project!.status == ProjectStatus.archived)
           IconButton(
             icon: const Icon(Icons.unarchive),
@@ -280,114 +297,88 @@ class _DetailAppBar extends ConsumerWidget {
 
               if (!context.mounted) return;
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Project unarchived.")
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Project unarchived.')));
 
               Navigator.of(context).pop();
             },
           ),
-
         IconButton(
           icon: const Icon(Icons.delete),
           color: cs.error,
-          onPressed: () async {
-            bool? confirm = await confirmDelete(context);
+          onPressed: project == null
+              ? null
+              : () async {
+                  final bool? confirm = await confirmDelete(context);
 
-            if (confirm == true) {
-              await ref.read(projectProvider(project!.id!).notifier).delete();
-              
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
+                  if (confirm == true) {
+                    await ref.read(projectProvider(project!.id!).notifier).delete();
 
-              if (!context.mounted) return;
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Project deleted"),
-                )
-              );
-            }
-          },
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text('Project deleted')));
+                  }
+                },
         ),
       ],
     );
   }
 }
 
-class _SessionsHeader extends StatelessWidget {
-  const _SessionsHeader({required this.count});
+// ── Sessions tab ─────────────────────────────────────────────────────────────
 
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-        child: Text(
-          'SESSIONS',
-          style: TextStyle(
-            fontSize: 10,
-            color: cs.onSurfaceVariant.withValues(alpha: 0.5),
-            letterSpacing: 0.12,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Empty state ───────────────────────────────────────────────────────────────
-
-class _EmptySessionsSliver extends StatelessWidget {
-  const _EmptySessionsSliver();
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return SliverFillRemaining(
-      hasScrollBody: false,
-      child: Center(
-        child: Text(
-          'No sessions yet.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: cs.onSurfaceVariant.withValues(alpha: 0.4),
-            height: 1.6,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Session list ──────────────────────────────────────────────────────────────
-
-class _SessionList extends StatelessWidget {
-  const _SessionList({required this.project, required this.sessions});
+class _SessionsTab extends ConsumerWidget {
+  const _SessionsTab({required this.project, required this.sessions});
 
   final Project project;
   final List<Session> sessions;
 
   @override
-  Widget build(BuildContext context) {
-    return SliverList.separated(
-      itemCount: sessions.length,
-      separatorBuilder: (_, _) => Divider(
-        height: 1,
-        indent: 24,
-        endIndent: 24,
-        color: const Color(0xFF1E1E1E),
-      ),
-      itemBuilder: (context, i) => _SessionTile(project: project, session: sessions[i]),
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (sessions.isEmpty) {
+      return const _EmptyState(message: 'No sessions yet.');
+    }
+
+    final notifier = ref.read(projectProvider(project.id!).notifier);
+    final hasMore = notifier.hasMore();
+
+    return ListView.separated(
+      padding: const EdgeInsets.only(bottom: 16),
+      itemCount: sessions.length + 1,
+      separatorBuilder: (_, i) => i < sessions.length - 1
+          ? const Divider(height: 1, indent: 24, endIndent: 24, color: Color(0xFF1E1E1E))
+          : const SizedBox.shrink(),
+      itemBuilder: (context, i) {
+        if (i == sessions.length) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: hasMore
+                ? ElevatedButton(
+                    onPressed: () =>
+                        ref.read(projectProvider(project.id!).notifier).loadMore(),
+                    child: const Text('Load More'),
+                  )
+                : Center(
+                    child: Text(
+                      'Reached the end',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+          );
+        }
+        return _SessionTile(project: project, session: sessions[i]);
+      },
     );
   }
 }
@@ -464,7 +455,6 @@ class _SessionTile extends ConsumerWidget {
                   ),
                 ),
               ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -474,34 +464,75 @@ class _SessionTile extends ConsumerWidget {
                     onPressed: () => showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
-                      builder: (_) => SessionForm(project: project, session: session)
+                      builder: (_) => SessionForm(project: project, session: session),
                     ),
                   ),
-
                   IconButton(
                     icon: const Icon(Icons.delete),
                     color: cs.error,
                     onPressed: () async {
-                      bool? confirm = await confirmDelete(context, item: 'session');
+                      final bool? confirm = await confirmDelete(context, item: 'session');
 
                       if (confirm == true) {
                         await ref.read(sessionProvider(session.id!).notifier).delete();
-                        
+
                         if (!context.mounted) return;
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text("Session deleted"),
-                          )
-                        );
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(content: Text('Session deleted')));
                       }
                     },
                   ),
                 ],
-              )
+              ),
             ],
-          )
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Ideas tab (stub) ─────────────────────────────────────────────────────────
+
+// Placeholder pending IdeaDao / ideaProvider. Expected to mirror
+// _SessionsTab: watch an AsyncValue<List<Idea>>, render open ideas
+// unchecked and done ideas struck through, with an inline add field
+// at the bottom of the list (per spec — no modal, no FAB for ideas).
+class _IdeasTab extends StatelessWidget {
+  const _IdeasTab({required this.project});
+
+  final Project project;
+
+  @override
+  Widget build(BuildContext context) {
+    return const _EmptyState(message: 'Ideas — coming soon.');
+  }
+}
+
+// ── Shared empty state ───────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            color: cs.onSurfaceVariant.withValues(alpha: 0.4),
+            height: 1.6,
+          ),
+        ),
       ),
     );
   }
