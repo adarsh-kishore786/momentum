@@ -205,9 +205,11 @@ class _ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     Color boxDecorationColor;
     String buttonText;
-    final colorScheme = Theme.of(context).colorScheme;
+    Color buttonTextColor = colorScheme.primary;
 
     switch (status) {
       case ProjectStatus.active: 
@@ -216,6 +218,7 @@ class _ProjectCard extends StatelessWidget {
 
       case ProjectStatus.archived:
         boxDecorationColor = colorScheme.surfaceDim;
+        buttonTextColor = colorScheme.onSurface;
         buttonText = "Revive";
 
       case ProjectStatus.planned:
@@ -302,6 +305,7 @@ class _ProjectCard extends StatelessWidget {
                         ),
                         child: Text(
                           buttonText,
+                          style: TextStyle(color: buttonTextColor),
                         )
                       ),
                     ],
