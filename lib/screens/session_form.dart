@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
 import 'package:momentum/models/session.dart';
-import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/notifiers/session_create_notifier.dart';
+import 'package:momentum/notifiers/session_notifier.dart';
 import 'package:momentum/screens/commons.dart';
 
 class SessionForm extends ConsumerStatefulWidget {
@@ -65,7 +66,7 @@ class _SessionFormState extends ConsumerState<SessionForm> {
     });
 
     try {
-      final notifier = ref.read(dashboardProvider.notifier);
+      final notifier = ref.read(sessionProvider(widget.session!.id!).notifier);
       if (_isEditing) {
         await notifier.updateSession(
           widget.session!.copyWith(
@@ -75,6 +76,7 @@ class _SessionFormState extends ConsumerState<SessionForm> {
           ),
         );
       } else {
+        final notifier = ref.read(sessionCreateProvider.notifier);
         await notifier.logSession(
           duration,
           notes,

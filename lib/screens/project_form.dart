@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:momentum/models/project.dart';
-import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/notifiers/project_create_notifier.dart';
+import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/commons.dart';
 
@@ -48,13 +49,16 @@ class _ProjectFormState extends ConsumerState<ProjectForm> {
 
     try {
       final int projectId;
-      final notifier = ref.read(dashboardProvider.notifier);
       if (_isEditing) {
         projectId = widget.project!.id!;
+
+        final notifier = ref.read(projectProvider(projectId).notifier);
+
         await notifier.updateProject(
           widget.project!.copyWith(name: name, description: desc),
         );
       } else {
+        final notifier = ref.read(projectCreateProvider.notifier);
         projectId = await notifier.insertProject(name, desc);
       }
 

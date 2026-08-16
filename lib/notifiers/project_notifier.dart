@@ -17,7 +17,20 @@ class ProjectNotifier extends AsyncNotifier<Project> {
     return await repository.getProjectById(projectId);
   }
 
-  Future<void> delete() async {
+  Future<void> updateProject(Project project) async {
+    if (project.id != projectId) return;
+
+    final repository = await ref.read(repositoryProvider.future);
+    if (!ref.mounted) return;
+
+    await repository.updateProject(project);
+    if (!ref.mounted) return;
+
+    ref.invalidate(projectProvider);
+    ref.invalidateSelf();
+  }
+
+  Future<void> deleteProject() async {
     final repository = await ref.read(repositoryProvider.future);
     if (!ref.mounted) return;
 
@@ -47,7 +60,6 @@ class ProjectNotifier extends AsyncNotifier<Project> {
     if (!ref.mounted) return;
 
     if (project.status == ProjectStatus.archived) {
-
       ProjectStatus status = ProjectStatus.active;
       final val = await repository.isProjectActive(projectId);
 

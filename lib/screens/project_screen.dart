@@ -310,7 +310,7 @@ class _DetailAppBar extends ConsumerWidget {
                   final bool? confirm = await confirmDelete(context);
 
                   if (confirm == true) {
-                    await ref.read(projectProvider(project!.id!).notifier).delete();
+                    await ref.read(projectProvider(project!.id!).notifier).deleteProject();
 
                     if (context.mounted) {
                       Navigator.of(context).pop();
@@ -337,8 +337,8 @@ class _SessionsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionsState = ref.watch(projectSessionsNotifier(project.id!));
-    final sessionsNotifier = ref.watch(projectSessionsNotifier(project.id!).notifier);
+    final sessionsState = ref.watch(projectSessionsProvider(project.id!));
+    final sessionsNotifier = ref.watch(projectSessionsProvider(project.id!).notifier);
 
     return sessionsState.when(
       data: (sessions) => _SessionsList(

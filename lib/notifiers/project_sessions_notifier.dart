@@ -58,5 +58,5 @@ class ProjectSessionsNotifier extends AsyncNotifier<List<Session>> {
   bool hasMore() => _hasMore;
 }
 
-final projectSessionsNotifier = AsyncNotifierProvider.family<ProjectSessionsNotifier, List<Session>, int>
+final projectSessionsProvider = AsyncNotifierProvider.family<ProjectSessionsNotifier, List<Session>, int>
 (ProjectSessionsNotifier.new);
