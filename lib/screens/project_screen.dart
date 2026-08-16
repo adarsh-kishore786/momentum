@@ -5,6 +5,7 @@ import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
+import 'package:momentum/notifiers/project_sessions_notifier.dart';
 import 'package:momentum/notifiers/session_notifier.dart';
 import 'package:momentum/notifiers/tab_reset_notifier.dart';
 import 'package:momentum/screens/commons.dart';
@@ -57,9 +58,8 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
       body: state.when(
         loading: () => const _LoadingBody(),
         error: (e, _) => _ErrorBody(error: e),
-        data: (data) => _DetailBody(
-          project: data.project,
-          sessions: data.sessions,
+        data: (project) => _DetailBody(
+          project: project,
           tabController: _tabController,
         ),
       ),
@@ -69,7 +69,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
                 onPressed: () => showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
-                  builder: (_) => SessionForm(project: data.project),
+                  builder: (_) => SessionForm(project: data),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 child: const Icon(Icons.add),
@@ -132,12 +132,10 @@ class _ErrorBody extends StatelessWidget {
 class _DetailBody extends StatelessWidget {
   const _DetailBody({
     required this.project,
-    required this.sessions,
     required this.tabController,
   });
 
   final Project project;
-  final List<Session> sessions;
   final TabController tabController;
 
   @override
@@ -167,8 +165,8 @@ class _DetailBody extends StatelessWidget {
       body: TabBarView(
         controller: tabController,
         children: [
-          _SessionsTab(project: project, sessions: sessions),
-          _IdeasTab(project: project),
+          _SessionsTab(project),
+          _IdeasTab(project),
         ],
       ),
     );
@@ -333,19 +331,46 @@ class _DetailAppBar extends ConsumerWidget {
 // ── Sessions tab ─────────────────────────────────────────────────────────────
 
 class _SessionsTab extends ConsumerWidget {
-  const _SessionsTab({required this.project, required this.sessions});
+  const _SessionsTab(this.project);
 
   final Project project;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionsState = ref.watch(projectSessionsNotifier(project.id!));
+    final sessionsNotifier = ref.watch(projectSessionsNotifier(project.id!).notifier);
+
+    return sessionsState.when(
+      data: (sessions) => _SessionsList(
+          project: project,
+          sessions: sessions,
+          hasMore: sessionsNotifier.hasMore(),
+          onLoadMore: sessionsNotifier.loadMore,
+        ),
+      error: (e, _) => _ErrorBody(error: e),
+      loading: () => const _LoadingBody()
+    );
+  }
+}
+
+class _SessionsList extends ConsumerWidget {
+  final Project project;
   final List<Session> sessions;
+  final bool hasMore;
+  final VoidCallback onLoadMore;
+
+  const _SessionsList({
+    required this.project,
+    required this.sessions,
+    required this.hasMore,
+    required this.onLoadMore
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (sessions.isEmpty) {
       return const _EmptyState(message: 'No sessions yet.');
     }
-
-    final notifier = ref.read(projectProvider(project.id!).notifier);
-    final hasMore = notifier.hasMore();
 
     return ListView.separated(
       padding: const EdgeInsets.only(bottom: 16),
@@ -359,8 +384,7 @@ class _SessionsTab extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: hasMore
                 ? ElevatedButton(
-                    onPressed: () =>
-                        ref.read(projectProvider(project.id!).notifier).loadMore(),
+                    onPressed: onLoadMore,
                     child: const Text('Load More'),
                   )
                 : Center(
@@ -500,7 +524,7 @@ class _SessionTile extends ConsumerWidget {
 // unchecked and done ideas struck through, with an inline add field
 // at the bottom of the list (per spec — no modal, no FAB for ideas).
 class _IdeasTab extends StatelessWidget {
-  const _IdeasTab({required this.project});
+  const _IdeasTab(this.project);
 
   final Project project;
 
