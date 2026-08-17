@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project.dart';
+import 'package:momentum/notifiers/dashboard_notifier.dart';
 import 'package:momentum/providers/providers.dart';
 
 class ProjectCreateNotifier extends AsyncNotifier<void> {
@@ -14,7 +15,7 @@ class ProjectCreateNotifier extends AsyncNotifier<void> {
     final repository = await ref.read(repositoryProvider.future);
     int projectId = await repository.insertProject(project);
 
-    ref.invalidateSelf();
+    ref.invalidate(dashboardProvider);
     return projectId;
   }
 }

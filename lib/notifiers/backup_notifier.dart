@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/data/backup_exception.dart';
 import 'package:momentum/data/backup_repository.dart';
@@ -33,8 +34,12 @@ class BackupNotifier extends Notifier<BackupState> {
     state = const BackupState(BackupStatus.working);
     try {
       await ref.read(backupRepositoryProvider).importFrom(path);
-      ref.invalidate(databaseProvider); // forces every downstream provider to refetch
       state = const BackupState(BackupStatus.success);
+      SchedulerBinding.instance.addPostFrameCallback((_)
+        {
+          ref.invalidate(databaseProvider);
+        }
+      );
       return true;
     } on BackupException catch (e) {
       state = BackupState(BackupStatus.error, e.message);

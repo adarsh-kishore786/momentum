@@ -66,8 +66,8 @@ class _SessionFormState extends ConsumerState<SessionForm> {
     });
 
     try {
-      final notifier = ref.read(sessionProvider(widget.session!.id!).notifier);
       if (_isEditing) {
+        final notifier = ref.read(sessionProvider(widget.session!.id!).notifier);
         await notifier.updateSession(
           widget.session!.copyWith(
             durationMinutes: duration,
