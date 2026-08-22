@@ -47,6 +47,8 @@ class _SessionsList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+
     if (sessions.isEmpty) {
       return const EmptyState(message: 'No sessions yet.');
     }
@@ -55,7 +57,7 @@ class _SessionsList extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 16),
       itemCount: sessions.length + 1,
       separatorBuilder: (_, i) => i < sessions.length - 1
-          ? const Divider(height: 1, indent: 24, endIndent: 24, color: Color(0xFF1E1E1E))
+          ? Divider(height: 1, indent: 24, endIndent: 24, color: cs.outlineVariant)
           : const SizedBox.shrink(),
       itemBuilder: (context, i) {
         if (i == sessions.length) {

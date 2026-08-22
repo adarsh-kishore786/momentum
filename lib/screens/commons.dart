@@ -37,11 +37,11 @@ class MomentumField extends StatelessWidget {
         errorText: errorText,
         labelStyle: TextStyle(color: cs.onSurfaceVariant),
         filled: true,
-        fillColor: const Color(0xFF141414),
+        fillColor: cs.surfaceContainerHighest,
         errorStyle: TextStyle(color: cs.error),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF252525)),
+          borderSide: BorderSide(color: cs.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -93,7 +93,7 @@ class _MomentumDateSelectorState extends ConsumerState<MomentumDateSelector> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -154,7 +154,7 @@ class SaveButton extends StatelessWidget {
         },
         style: FilledButton.styleFrom(
           backgroundColor: cs.primary,
-          foregroundColor: const Color(0xFF0F0F0F),
+          foregroundColor: cs.onPrimary,
           disabledBackgroundColor: cs.primary.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

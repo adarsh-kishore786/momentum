@@ -45,6 +45,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final state = ref.watch(projectProvider(widget.projectId));
 
     ref.listen<int>(projectTabResetProvider, (prev, next) {
@@ -68,7 +69,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
                   isScrollControlled: true,
                   builder: (_) => SessionForm(project: data),
                 ),
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: cs.primary,
                 child: const Icon(Icons.add),
               )
             : null,
@@ -113,7 +114,7 @@ class _DetailBody extends StatelessWidget {
               controller: tabController,
               labelColor: cs.primary,
               unselectedLabelColor: cs.secondary,
-              dividerColor: cs.tertiary,
+              dividerColor: cs.outlineVariant,
               tabs: const [
                 Tab(text: 'Sessions'),
                 Tab(text: 'Ideas'),

@@ -8,6 +8,7 @@ import 'package:momentum/notifiers/tab_reset_notifier.dart';
 import 'package:momentum/routing/routes.dart';
 import 'package:momentum/screens/project_form.dart';
 import 'package:momentum/screens/session_form.dart';
+import 'package:momentum/theme/momentum_status_colors.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -95,7 +96,7 @@ class _Dashboard extends StatelessWidget {
             labelColor: colorScheme.primary,
             unselectedLabelColor: colorScheme.secondary,
             controller: tabController,
-            dividerColor: colorScheme.tertiary,
+            dividerColor: colorScheme.outlineVariant,
             tabs: [
               Tab(text: "Active"),
               Tab(text: "Planned"),
@@ -171,24 +172,23 @@ class _ProjectCard extends StatelessWidget {
 
   const _ProjectCard({required this.item, required this.status});
 
-  Color get _boxColor {
+  /// Left-border accent. For active projects this is the recency signal
+  /// (fresh/warm/stale); for planned/archived it's a flat status accent,
+  /// not tied to session recency at all.
+  Color _accentColor(MomentumStatusColors sc) {
     if (status == ProjectStatus.archived) {
-      return const Color(0xFF222222);
+      return sc.stale.withValues(alpha: 0.3);
     }
 
     if (status == ProjectStatus.planned) {
-      return const Color(0x22222222);
+      return sc.plannedAccent;
     }
 
-    const activeColor  = Color(0xFFC8F53A);
-    const fadingColor  = Color(0xFFF5C23A);
-    const dormantColor = Color(0xFFF5603A);
-
-    if (item.lastSession == null) return dormantColor;
+    if (item.lastSession == null) return sc.stale;
     final days = DateTime.now().difference(item.lastSession!.date).inDays;
-    if (days <= 7)  return activeColor;
-    if (days <= 14) return fadingColor;
-    return dormantColor;
+    if (days <= 7)  return sc.fresh;
+    if (days <= 14) return sc.warm;
+    return sc.stale;
   }
 
   String get _recencyLabel {
@@ -206,25 +206,29 @@ class _ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final statusColors = Theme.of(context).extension<MomentumStatusColors>()!;
 
     Color boxDecorationColor;
     String buttonText;
     Color buttonTextColor = colorScheme.primary;
 
     switch (status) {
-      case ProjectStatus.active: 
+      case ProjectStatus.active:
         boxDecorationColor = colorScheme.surface;
         buttonText = "Log";
 
       case ProjectStatus.archived:
-        boxDecorationColor = colorScheme.surfaceDim;
+        boxDecorationColor = statusColors.archivedFill;
         buttonTextColor = colorScheme.onSurface;
         buttonText = "Revive";
 
       case ProjectStatus.planned:
-        boxDecorationColor = colorScheme.surfaceDim;
+        boxDecorationColor = statusColors.plannedFill;
+        buttonTextColor = statusColors.plannedAccent;
         buttonText = "Start";
     }
+
+    final accentColor = _accentColor(statusColors);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 0, 24, 10),
@@ -238,7 +242,7 @@ class _ProjectCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: boxDecorationColor,
             borderRadius: BorderRadius.circular(14),
-            border: Border(left: BorderSide(color: _boxColor, width: 3)),
+            border: Border(left: BorderSide(color: accentColor, width: 3)),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -287,7 +291,7 @@ class _ProjectCard extends StatelessWidget {
                         Text(
                           _recencyLabel,
                           style: TextStyle(
-                            color: _boxColor,
+                            color: accentColor,
                             fontSize: 13
                           )
                         ),
