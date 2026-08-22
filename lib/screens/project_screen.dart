@@ -4,6 +4,7 @@ import 'package:momentum/models/project.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/notifiers/tab_reset_notifier.dart';
+import 'package:momentum/screens/project_ideas_screen.dart';
 import 'package:momentum/screens/project_screen_commons.dart';
 import 'package:momentum/screens/project_sessions_screen.dart';
 import 'package:momentum/screens/session_form.dart';
@@ -116,7 +117,7 @@ class _DetailBody extends StatelessWidget {
         controller: tabController,
         children: [
           ProjectSessionsScreen(project),
-          _IdeasTab(project),
+          ProjectIdeasScreen(project),
         ],
       ),
     );
@@ -192,20 +193,3 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant _TabBarDelegate oldDelegate) =>
       tabBar != oldDelegate.tabBar;
 }
-
-
-// ── Sessions tab ─────────────────────────────────────────────────────────────
-
-
-class _IdeasTab extends StatelessWidget {
-  const _IdeasTab(this.project);
-
-  final Project project;
-
-  @override
-  Widget build(BuildContext context) {
-    return const EmptyState(message: 'Ideas — coming soon.');
-  }
-}
-
-// ── Shared empty state ───────────────────────────────────────────────────────
