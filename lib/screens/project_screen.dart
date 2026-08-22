@@ -74,6 +74,15 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
             : null,
         orElse: () => null,
       ),
+      bottomSheet: state.maybeWhen(
+        data: (data) => _tabIndex == 1
+            ? Material(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: AddIdeaField(projectId: data.id!),
+              )
+            : null,
+        orElse: () => null,
+      ),
     );
   }
 }
