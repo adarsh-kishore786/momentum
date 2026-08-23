@@ -172,9 +172,6 @@ class _ProjectCard extends StatelessWidget {
 
   const _ProjectCard({required this.item, required this.status});
 
-  /// Left-border accent. For active projects this is the recency signal
-  /// (fresh/warm/stale); for planned/archived it's a flat status accent,
-  /// not tied to session recency at all.
   Color _accentColor(MomentumStatusColors sc) {
     if (status == ProjectStatus.archived) {
       return sc.stale.withValues(alpha: 0.3);
@@ -299,7 +296,7 @@ class _ProjectCard extends StatelessWidget {
                       TextButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll<Color>(
-                            colorScheme.primary.withValues(alpha: 0.2)
+                            colorScheme.primaryContainer
                           ),
                         ),
                         onPressed: () => showModalBottomSheet(

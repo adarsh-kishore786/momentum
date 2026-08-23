@@ -30,6 +30,36 @@ class MomentumApp extends ConsumerWidget {
       title: 'Momentum',
       routerConfig: router,
       theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+        colorScheme: const ColorScheme.light(
+          surface: Color(0xFFFAFAFA),
+          surfaceDim: Color(0xFFF0F0F0),
+          surfaceContainerHighest: Color(0xFFF2F2F2),
+          onSurface: Color(0xFF1A1A1A),
+          onSurfaceVariant: Color(0xFF5C5C5C),
+          outline: Color(0xFFD8D8D8),
+          outlineVariant: Color(0xFFE8E8E8),
+          primary: Color(0xFF6B8F0A),
+          onPrimary: Color(0xFFFFFFFF),
+          secondary: Color(0xFF8A8A8A),
+          error: Color(0xFFC0392B),
+          onError: Colors.white,
+          primaryContainer: Color(0xFFE3EFC9),
+          onPrimaryContainer: Color(0xFF3D5206),
+        ),
+        // Light MomentumStatusColors — same semantic slots, darkened for contrast on white
+        extensions: const [
+          MomentumStatusColors(
+            fresh: Color(0xFF6B8F0A),
+            warm: Color(0xFFB8860B),
+            stale: Color(0xFFC0392B),
+            plannedAccent: Color(0xFF1F6FA8),
+            plannedFill: Color(0xFFEAF3FA),
+            archivedFill: Color(0xFFEFEFEF),
+          ),
+        ],
+      ),
+      darkTheme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF0F0F0F),
         colorScheme: const ColorScheme.dark(
           surface: Color(0xFF1C1C1C),
@@ -42,8 +72,8 @@ class MomentumApp extends ConsumerWidget {
           primary: Color(0xFFC8F53A),
           onPrimary: Color(0xFF0F0F0F),
           secondary: Color(0xFF555555),
-          // muted UI text, not a fill color error: Color(0xFFE84C3D),
-          // reserved for real errors only onError: Colors.white,
+          primaryContainer: Color(0xFF2A3A12),
+          onPrimaryContainer: Color(0xFFC8F53A),
         ),
         extensions: const[
           MomentumStatusColors(
@@ -55,7 +85,8 @@ class MomentumApp extends ConsumerWidget {
             archivedFill: Color(0xFF1A1A1A),
           )
         ],
-      )
+      ),
+      themeMode: ThemeMode.system,
     );
   }
 }
