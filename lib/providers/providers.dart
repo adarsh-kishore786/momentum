@@ -4,6 +4,8 @@ import 'package:momentum/data/daos/session_dao.dart';
 import 'package:momentum/data/database_helper.dart';
 import 'package:momentum/data/daos/project_dao.dart';
 import 'package:momentum/data/repository.dart';
+import 'package:momentum/data/settings_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 final databaseProvider = FutureProvider<Database>((ref) {
@@ -33,4 +35,12 @@ final repositoryProvider = FutureProvider<Repository>((ref) async {
     sessionDao: await ref.watch(sessionDaoProvider.future),
     ideaDao:    await ref.watch(ideaDaoProvider.future)
   );
+});
+
+final sharedPreferencesProvider =
+    FutureProvider<SharedPreferences>((ref) => SharedPreferences.getInstance());
+
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider).requireValue;
+  return SharedPreferencesSettingsRepository(prefs);
 });

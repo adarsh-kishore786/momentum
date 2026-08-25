@@ -76,6 +76,20 @@ class MoreScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)
+                ),
+                onPressed: () { context.push(Routes.settings); },
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.settings),
+                    Text('Settings')
+                  ],
+                ),
+              ),
             ],
           ),
         ),

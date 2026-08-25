@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:momentum/notifiers/settings_notifier.dart';
 import 'package:momentum/routing/router.dart';
 import 'package:momentum/theme/momentum_status_colors.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -25,6 +26,7 @@ class MomentumApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(settingsProvider).value?.themeMode ?? ThemeMode.system;
 
     return MaterialApp.router(
       title: 'Momentum',
@@ -86,7 +88,7 @@ class MomentumApp extends ConsumerWidget {
           )
         ],
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
     );
   }
 }
