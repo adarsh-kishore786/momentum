@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:momentum/constants.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/project_with_last_session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
@@ -183,8 +184,8 @@ class _ProjectCard extends StatelessWidget {
 
     if (item.lastSession == null) return sc.stale;
     final days = DateTime.now().difference(item.lastSession!.date).inDays;
-    if (days <= 7)  return sc.fresh;
-    if (days <= 14) return sc.warm;
+    if (days <= Constants.freshDays)  return sc.fresh;
+    if (days <= Constants.warmDays) return sc.warm;
     return sc.stale;
   }
 
