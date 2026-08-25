@@ -126,6 +126,7 @@ class _Dashboard extends StatelessWidget {
             builder: (_) => const ProjectForm(),
           ),
           backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           child: Icon(Icons.add),
         ),
       ),

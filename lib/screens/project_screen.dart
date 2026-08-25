@@ -70,6 +70,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
                   builder: (_) => SessionForm(project: data),
                 ),
                 backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
                 child: const Icon(Icons.add),
               )
             : null,
