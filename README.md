@@ -45,8 +45,8 @@ to keep track of your activity and investment in it, then it goes into the activ
 state.
 
 <div align="center">
-  <img src="./assets/projects_planned_light..jpeg" width="200" target="_blank" />
-  <img src="./assets/projects_planned_dark..jpeg" width="200" target="_blank" />
+  <img src="./assets/projects_planned_light.jpeg" width="200" target="_blank" />
+  <img src="./assets/projects_planned_dark.jpeg" width="200" target="_blank" />
   <br />
   <sub>Planned projects list</sub>
 </div>
