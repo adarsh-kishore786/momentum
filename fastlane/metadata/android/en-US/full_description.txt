@@ -1,0 +1,20 @@
+Momentum is a project tracker for open-ended project work;
+the kind that's never really "done."
+
+Rather than tracking completion, Momentum tracks engagement: 
+how recently you touched a project, and how much time you've invested in it. 
+There are no due dates, no priority scores, and no completion percentages.
+It measures effort, not results.
+
+Features:
+
+* Track projects as active, planned, or archived
+* Log sessions — what you did and how long you spent — to build a 
+running record of your work
+* Keep a running list of ideas per project, separate from your session log
+* See at a glance which projects are getting stale, 
+colour-coded by how recently you last worked on them
+
+All data is stored locally in a SQLite database. 
+No account, no login, no internet connection required, and 
+nothing is collected or sent anywhere.
