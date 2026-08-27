@@ -1,18 +1,23 @@
 # Momentum
 
-A mobile app (Flutter) for tracking personal technical projects.
-The core philosophy: projects are never "done", so the app tracks 
+A mobile app made used for tracking personal projects.
+The core philosophy is that projects are never "done", so the app tracks 
 momentum and time invested, not completion.
 
 Also, the data is always locally stored (sqlite DB). No login required, and no 
-information is collected. You can even use it without the internet.
+information is collected. You can use it without the internet. Made using 
+Flutter.
 
 ## The Problem
 
-Personal learning projects stall not because of lost interest, but because 
+Personal learning projects do not stall because of lost interest, but because 
 there's no lightweight way to notice neglect, record progress, or capture 
 ideas as they come. Traditional task managers impose a completion mindset 
 that doesn't fit open-ended technical work.
+
+Momentum seeks to fill that gap by being an open-ended project tracker.
+It keeps track of sessions, the last time you touched the project, and stores
+your ideas as they come.
 
 ## Features
 

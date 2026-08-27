@@ -39,7 +39,7 @@ class _IdeaList extends ConsumerWidget {
     if (ideas.isEmpty) {
       return Column(
         children: [
-          const Expanded(child: EmptyState(message: 'No ideas yet.')),
+          const Expanded(child: EmptyState(message: 'Keep track of your project milestones.')),
           AddIdeaField(projectId: project.id!),
         ],
       );

@@ -50,7 +50,7 @@ class _SessionsList extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
 
     if (sessions.isEmpty) {
-      return const EmptyState(message: 'No sessions yet.');
+      return const EmptyState(message: 'Log your project sessions.');
     }
 
     return ListView.separated(
