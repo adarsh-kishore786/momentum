@@ -7,7 +7,7 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = 
         '''
-        Personal learning projects stall not because of lost interest, but because
+        Personal learning projects do not stall because of lost interest, but because
         there's no lightweight way to notice neglect, record progress, or capture 
         ideas as they come. Traditional task managers impose a completion mindset 
         that doesn't fit open-ended technical work.
@@ -15,7 +15,10 @@ class AboutScreen extends StatelessWidget {
         Which is why I created Momentum, a project tracker that does not make 
         you tick a checklist of projects, but instead lets you log sessions to
         measure progress and see how much time and effort you are spending on 
-        your projects. I hope you find this useful.
+        your projects. You can also note down your project milestones and ideas
+        as and when they come to you.
+        <br>
+        I hope you find this useful.
         ''';
 
     return Scaffold(

@@ -30,8 +30,16 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   rename_app: ^1.6.6
   build_runner: ^2.15.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
   assets:
     - assets/qr.jpeg
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/ic_icon_flat_1024.png"
+  adaptive_icon_background: "assets/icon/ic_launcher_background.png"
+  adaptive_icon_foreground: "assets/icon/ic_launcher_foreground.png"
