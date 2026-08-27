@@ -87,3 +87,16 @@ can always get a record of what all you have worked on on which day.
   <sub>Project with sessions</sub>
 </div>
 <br />
+
+### Ideas
+
+Your project may have some major milestones that you want to keep track of.
+The Ideas section of a project does just that.
+
+<div align="center">
+    <img src="./assets/ideas_light.jpeg" width="200" target="_blank" />
+    <img src="./assets/ideas_dark.jpeg" width="200" target="_blank" />
+    <br />
+    <sub>Project ideas</sub>
+</div>
+<br />
