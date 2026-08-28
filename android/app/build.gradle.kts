@@ -63,7 +63,6 @@ android {
         includeInBundle = false
     }
 }
-}
 
 flutter {
     source = "../.."
