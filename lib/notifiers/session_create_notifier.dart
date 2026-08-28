@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:momentum/models/project_status.dart';
 import 'package:momentum/models/session.dart';
 import 'package:momentum/notifiers/dashboard_notifier.dart';
+import 'package:momentum/notifiers/project_notifier.dart';
 import 'package:momentum/notifiers/project_sessions_notifier.dart';
 import 'package:momentum/providers/providers.dart';
 
@@ -38,6 +39,7 @@ class SessionCreateNotifier extends AsyncNotifier<void> {
     if (!ref.mounted) return;
 
     ref.invalidate(dashboardProvider);
+    ref.invalidate(projectProvider);
     ref.invalidate(projectSessionsProvider);
   }
 }
