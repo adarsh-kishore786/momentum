@@ -105,3 +105,28 @@ The Ideas section of a project does just that.
     <sub>Project ideas</sub>
 </div>
 <br />
+
+## Build from source
+Make sure that your Flutter version is at least `3.44.8`.
+
+Clone the repo:
+```bash
+git clone https://github.com/adarsh-kishore786/momentum
+cd momentum
+```
+
+Install dependencies:
+```bash
+flutter pub get
+```
+
+For Android, you can build an APK and install that:
+```bash
+flutter build apk --release
+```
+Alternatively, you can execute run from command line directly and install on your phone:
+```bash
+flutter run --release
+```
+
+For iOS, you can build from source if you have MacOS and Xcode installed.
