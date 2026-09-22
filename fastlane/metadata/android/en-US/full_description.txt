@@ -6,10 +6,13 @@ how recently you touched a project, and how much time you've invested in it.
 There are no due dates, no priority scores, and no completion percentages.
 It measures effort, not results.
 
+Additionally, you can track important project ideas in the "Ideas" section
+of a project.
+
 Features:
 
 * Track projects as active, planned, or archived
-* Log sessions — what you did and how long you spent — to build a 
+* Log sessions — what you did and how long you spent on it — to build a 
 running record of your work
 * Keep a running list of ideas per project, separate from your session log
 * See at a glance which projects are getting stale, 
