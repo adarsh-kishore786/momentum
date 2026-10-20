@@ -1,14 +1,12 @@
 import java.util.Properties
 import java.io.FileInputStream
-import com.android.build.api.variant.FilterConfiguration.FilterType
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
 }
-
-val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
 
 val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties()
@@ -71,16 +69,15 @@ flutter {
     source = "../.."
 }
 
-androidComponents {
-    onVariants { variant ->
-        variant.outputs.forEach { output ->
-            val abi = output.filters
-                .find { it.filterType == FilterType.ABI }?.identifier
-            val abiCode = abiCodes[abi]
-            if (abiCode != null) {
-                val base = output.versionCode.orNull ?: return@forEach
-                output.versionCode.set(base * 10 + abiCode)
-            }
-        }
+val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
+android.applicationVariants.configureEach {
+  val variant = this
+  variant.outputs.forEach { output ->
+    val abi = output.filters.find { it.filterType == "ABI" }?.identifier
+    val abiVersionCode = abiCodes[abi]
+    if (abiVersionCode != null) {
+      val newCode = flutter.versionCode * 10 + abiVersionCode
+      (output as ApkVariantOutputImpl).versionCodeOverride = newCode
     }
+  }
 }
