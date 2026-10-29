@@ -1,6 +1,7 @@
 import java.util.Properties
 import java.io.FileInputStream
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import com.android.build.gradle.LibraryExtension
 
 plugins {
     id("com.android.application")
@@ -62,6 +63,22 @@ android {
         includeInApk = false
         // Disables dependency metadata when building Android App Bundles (for Google Play)
         includeInBundle = false
+    }
+}
+
+subprojects {
+    plugins.withId("com.android.library") {
+        if (name == "jni") {
+            extensions.configure<LibraryExtension>("android") {
+                defaultConfig {
+                    externalNativeBuild {
+                        cmake {
+                            arguments += "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none"
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
