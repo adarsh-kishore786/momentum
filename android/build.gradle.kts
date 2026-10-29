@@ -18,13 +18,11 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 
     plugins.withId("com.android.library") {
-        if (name == "jni") {
-            extensions.configure<LibraryExtension>("android") {
-                defaultConfig {
-                    externalNativeBuild {
-                        cmake {
-                            arguments += "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none"
-                        }
+        extensions.configure<LibraryExtension>("android") {
+            defaultConfig {
+                externalNativeBuild {
+                    cmake {
+                        arguments += "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none"
                     }
                 }
             }
