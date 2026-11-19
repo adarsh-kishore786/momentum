@@ -19,7 +19,7 @@ class ProjectIdeasScreen extends ConsumerWidget {
     final ideasState = ref.watch(projectIdeasNotifier(project.id!));
 
     return ideasState.when(
-      data: (ideas) => _IdeaList(project: project, ideas: ideas),
+      data: (ideas) => _IdeaList(ideas: ideas),
       error: (e, _) => ErrorBody(error: e),
       loading: () => LoadingBody(),
     );
@@ -27,10 +27,9 @@ class ProjectIdeasScreen extends ConsumerWidget {
 }
 
 class _IdeaList extends ConsumerWidget {
-  final Project project;
   final List<Idea> ideas;
 
-  const _IdeaList({required this.project, required this.ideas});
+  const _IdeaList({required this.ideas});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,8 +38,7 @@ class _IdeaList extends ConsumerWidget {
     if (ideas.isEmpty) {
       return Column(
         children: [
-          const Expanded(child: EmptyState(message: 'Keep track of your project milestones.')),
-          AddIdeaField(projectId: project.id!),
+          const EmptyState(message: 'Keep track of your project milestones.'),
         ],
       );
     }
@@ -78,7 +76,6 @@ class _IdeaList extends ConsumerWidget {
             },
           ),
         ),
-        AddIdeaField(projectId: project.id!),
       ],
     );
   }
