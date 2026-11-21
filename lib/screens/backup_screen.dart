@@ -64,7 +64,8 @@ class BackupScreen extends ConsumerWidget{
               if(!context.mounted) return;
               if( savedPath == null)
               {
-                // user cancelled — not an error, don't show a snackbar return;
+                // user cancelled — not an error, don't show a snackbar
+                return;
               }
               try{
                 if(
@@ -74,7 +75,7 @@ class BackupScreen extends ConsumerWidget{
                   )
                 )
                 {
-                  await tempFile.copy(savedPath!);
+                  await tempFile.copy(savedPath);
                   if( await tempFile.exists()) await tempFile.delete();
                   if(!context.mounted) return;
                 }
