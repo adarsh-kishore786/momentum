@@ -46,6 +46,11 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    // Read above the Scaffold: it strips padding.bottom from the MediaQuery it
+    // passes to the bottomSheet (removeBottomPadding: resizeToAvoidBottomInset),
+    // so a SafeArea inside the sheet would see zero. `padding` already subtracts
+    // viewInsets, so this is 0 while the keyboard is up and the sheet is lifted.
+    final systemPadding = MediaQuery.paddingOf(context);
     final state = ref.watch(projectProvider(widget.projectId));
 
     ref.listen<int>(projectTabResetProvider, (prev, next) {
@@ -80,7 +85,14 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen>
         data: (data) => _tabIndex == 1
             ? Material(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: AddIdeaField(projectId: data.id!),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: systemPadding.left,
+                    right: systemPadding.right,
+                    bottom: systemPadding.bottom,
+                  ),
+                  child: AddIdeaField(projectId: data.id!),
+                ),
               )
             : null,
         orElse: () => null,
