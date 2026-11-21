@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:momentum/data/backup_exception.dart';
 import 'package:momentum/data/database_helper.dart';
+import 'package:momentum/models/idea.dart';
+import 'package:momentum/models/project.dart';
+import 'package:momentum/models/session.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -16,7 +20,30 @@ abstract interface class BackupRepository {
 }
 
 class SqfliteBackupRepository implements BackupRepository {
-  static const _expectedTables = {'project', 'session', 'idea'};
+  /// The columns this version of the app reads from each table. A backup must
+  /// contain at least these; extra columns are allowed so backups from future
+  /// versions with an extended schema remain importable.
+  static const _requiredColumns = <String, Set<String>>{
+    Project.table: {
+      Project.primaryKey,
+      Project.colName,
+      Project.colDescription,
+      Project.colStatus,
+    },
+    Session.table: {
+      Session.primaryKey,
+      Session.colProjectId,
+      Session.colDate,
+      Session.colDurationMinutes,
+      Session.colNote,
+    },
+    Idea.table: {
+      Idea.primaryKey,
+      Idea.colProjectId,
+      Idea.colDescription,
+      Idea.colState,
+    },
+  };
 
   @override
   Future<File> prepareExport() async {
@@ -56,7 +83,7 @@ class SqfliteBackupRepository implements BackupRepository {
       throw const InvalidBackupFileException();
     }
 
-    if (!await _isValidMomentumDb(candidate)) {
+    if (!await isValidMomentumDb(candidate)) {
       throw const InvalidBackupFileException();
     }
 
@@ -88,20 +115,44 @@ class SqfliteBackupRepository implements BackupRepository {
     }
   }
 
-  Future<bool> _isValidMomentumDb(File file) async {
+  /// Checks both the schema and the stored values of the candidate. Matching
+  /// table names alone would let an unusable file replace the live DB; so
+  /// would a file with the right columns but values the models cannot parse.
+  /// Every row is fed through its model's [fromMap] here so a bad backup is
+  /// rejected with [InvalidBackupFileException] instead of surfacing a
+  /// technical cast error later while rendering the projects list.
+  @visibleForTesting
+  Future<bool> isValidMomentumDb(File file) async {
+    Database? db;
     try {
-      final db = await openDatabase(file.path, readOnly: true);
-      final tables = await db.query(
-        'sqlite_master',
-        columns: ['name'],
-        where: 'type = ?',
-        whereArgs: ['table'],
-      );
-      await db.close();
-      final names = tables.map((r) => r['name'] as String).toSet();
-      return _expectedTables.every(names.contains);
+      db = await openDatabase(file.path, readOnly: true);
+      for (final entry in _requiredColumns.entries) {
+        final schemaRows = await db.rawQuery(
+          'SELECT name FROM pragma_table_info(?)',
+          [entry.key],
+        );
+        final columns = schemaRows.map((r) => r['name'] as String).toSet();
+        if (!entry.value.every(columns.contains)) {
+          return false;
+        }
+
+        final rows = await db.query(entry.key, columns: entry.value.toList());
+        for (final row in rows) {
+          switch (entry.key) {
+            case Project.table:
+              Project.fromMap(row);
+            case Session.table:
+              Session.fromMap(row);
+            case Idea.table:
+              Idea.fromMap(row);
+          }
+        }
+      }
+      return true;
     } catch (_) {
-      return false; // not a sqlite file, or unreadable
+      return false; // not a sqlite file, unreadable, or values aren't parseable
+    } finally {
+      await db?.close();
     }
   }
 }
