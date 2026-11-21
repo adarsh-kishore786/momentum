@@ -63,6 +63,48 @@ void main() {
     expect(await repository.isValidMomentumDb(file), isFalse);
   });
 
+  test('rejects right column names with wrong value types', () async {
+    final file = await createDb('wrong_types.mbak', [
+      'CREATE TABLE project (id TEXT PRIMARY KEY, name INTEGER, '
+          'description BLOB, status REAL)',
+      'CREATE TABLE session (id TEXT PRIMARY KEY, project_id TEXT, date TEXT, '
+          'duration_minutes TEXT, note INTEGER)',
+      'CREATE TABLE idea (id TEXT PRIMARY KEY, project_id TEXT, '
+          'description INTEGER, state INTEGER)',
+      "INSERT INTO project VALUES ('not-an-int', 12345, x'00FF', 7.5)",
+      "INSERT INTO session VALUES ('s-1', 'p-1', '2026-11-15', 'twenty', 99)",
+      "INSERT INTO idea VALUES ('i-1', 'p-1', 12345, 1)",
+    ]);
+
+    expect(await repository.isValidMomentumDb(file), isFalse);
+  });
+
+  test('rejects an invalid enum value in an otherwise valid schema', () async {
+    final file = await createDb('bad_enum.mbak', [
+      'CREATE TABLE project (id INTEGER PRIMARY KEY, name TEXT, '
+          'description TEXT, status TEXT)',
+      Session.createTableSql,
+      Idea.createTableSql,
+      "INSERT INTO project (name, description, status) "
+          "VALUES ('X', 'Y', 'banana')",
+    ]);
+
+    expect(await repository.isValidMomentumDb(file), isFalse);
+  });
+
+  test('rejects NULL in a required column', () async {
+    final file = await createDb('null_column.mbak', [
+      'CREATE TABLE project (id INTEGER PRIMARY KEY, name TEXT, '
+          'description TEXT, status TEXT)',
+      Session.createTableSql,
+      Idea.createTableSql,
+      "INSERT INTO project (name, description, status) "
+          "VALUES (NULL, 'Y', 'planned')",
+    ]);
+
+    expect(await repository.isValidMomentumDb(file), isFalse);
+  });
+
   test('accepts the current schema', () async {
     final file = await createDb('valid.mbak', [
       Project.createTableSql,

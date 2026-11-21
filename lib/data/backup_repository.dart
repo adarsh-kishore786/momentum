@@ -115,27 +115,42 @@ class SqfliteBackupRepository implements BackupRepository {
     }
   }
 
-  /// Checks the candidate's schema, not just its table names. Matching names
-  /// alone would let a file with incompatible columns replace the live DB and
-  /// leave every query against it failing with "no such column".
+  /// Checks both the schema and the stored values of the candidate. Matching
+  /// table names alone would let an unusable file replace the live DB; so
+  /// would a file with the right columns but values the models cannot parse.
+  /// Every row is fed through its model's [fromMap] here so a bad backup is
+  /// rejected with [InvalidBackupFileException] instead of surfacing a
+  /// technical cast error later while rendering the projects list.
   @visibleForTesting
   Future<bool> isValidMomentumDb(File file) async {
     Database? db;
     try {
       db = await openDatabase(file.path, readOnly: true);
       for (final entry in _requiredColumns.entries) {
-        final rows = await db.rawQuery(
+        final schemaRows = await db.rawQuery(
           'SELECT name FROM pragma_table_info(?)',
           [entry.key],
         );
-        final columns = rows.map((r) => r['name'] as String).toSet();
+        final columns = schemaRows.map((r) => r['name'] as String).toSet();
         if (!entry.value.every(columns.contains)) {
           return false;
+        }
+
+        final rows = await db.query(entry.key, columns: entry.value.toList());
+        for (final row in rows) {
+          switch (entry.key) {
+            case Project.table:
+              Project.fromMap(row);
+            case Session.table:
+              Session.fromMap(row);
+            case Idea.table:
+              Idea.fromMap(row);
+          }
         }
       }
       return true;
     } catch (_) {
-      return false; // not a sqlite file, or unreadable
+      return false; // not a sqlite file, unreadable, or values aren't parseable
     } finally {
       await db?.close();
     }
