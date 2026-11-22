@@ -1,0 +1,3 @@
+* Fix ideas input overlap with keyboard
+* Fix false "Backup saved" message on cancelled save dialog
+* Reject invalid SQLite databases on import (wrong columns or column types)
